@@ -1,5 +1,6 @@
 const db = require('../models')
 const { validateAccessToken } = require('../helpers/helper_token');
+const { sendMessageNotify } = require('../helpers/helper_notify');
 const { validationResult } = require('express-validator');
 
 // image Upload
@@ -13,7 +14,6 @@ const Status = db.status;
 const Category = db.category;
 const Message = db.message;
 const User = db.users;
-const NotifyModel = db.notify;
 //const Review = db.comments
 
 // 1. create task
@@ -244,8 +244,9 @@ const addMessageToTask = async (req, res) => {
         });
         //console.log('checkUserId', checkUserId.userId);
     }
-
-    await NotifyModel.create({ message: `Задача № ${taskId} добавлен комментарий`, published: 1, user_id: checkUserId ? checkUserId.userId : userAccessTokenCheck.id, from_user_id: userAccessTokenCheck.id });
+    //console.log('message', message);
+    sendMessageNotify(taskId, message, checkUserId ? checkUserId.userId : userAccessTokenCheck.id, userAccessTokenCheck.id);
+    //await NotifyModel.create({ message: `Задача № ${taskId} добавлен комментарий`, published: 1, user_id: checkUserId ? checkUserId.userId : userAccessTokenCheck.id, from_user_id: userAccessTokenCheck.id });
 
     //console.log('createMessage', createMessage);
     const savedMessage = await Message.findOne({

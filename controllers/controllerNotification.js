@@ -14,7 +14,7 @@ const getUserNotify = async (req, res) => {
 
     if (userAccessTokenCheck.group !== 1) {
         query = {
-            attributes: ['id', 'message'],
+            attributes: ['id', 'message', 'description'],
             where: {
                 user_id: userAccessTokenCheck.id,
                 from_user_id: { [Op.ne]: userAccessTokenCheck.id }
@@ -22,7 +22,7 @@ const getUserNotify = async (req, res) => {
         }
     } else {
         query = {
-            attributes: ['id', 'message'],
+            attributes: ['id', 'message', 'description'],
             where: {
                 //user_id: userAccessTokenCheck.id,
                 from_user_id: { [Op.ne]: userAccessTokenCheck.id }

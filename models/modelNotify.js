@@ -1,11 +1,12 @@
-const User = require('./modelUser');
-
 module.exports = (sequelize, DataTypes) => {
 
     const Notify = sequelize.define("notification", {
         message: {
             type: DataTypes.TEXT,
             allowNull: false
+        },
+        description: {
+            type: DataTypes.STRING
         },
         types: {
             type: DataTypes.STRING

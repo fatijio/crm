@@ -99,6 +99,7 @@ const HeaderTemplate = () => {
                         <Alert
                             key={notice.id}
                             message={notice.message}
+                            description={notice.description}
                             closable
                             onClose={() => handleDeleteNotice(notice.id)}
                             className="notice_item"
