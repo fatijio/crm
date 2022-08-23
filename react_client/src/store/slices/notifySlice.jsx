@@ -35,6 +35,11 @@ const initialState = {
 const notifySlice = createSlice({
     name: 'notify',
     initialState: initialState,
+    reducers: {
+        setNewNotice(state, action) {
+            state.messages.push(action.payload);
+        }
+    },
     extraReducers: {
         [getNotifications.pending]: (state, action) => {
             state.loading = true;
@@ -56,5 +61,7 @@ const notifySlice = createSlice({
 
     }
 })
+
+export const { setNewNotice } = notifySlice.actions;
 
 export default notifySlice.reducer;

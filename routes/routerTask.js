@@ -17,11 +17,10 @@ router.get('/categories', controllerTask.getCategories);
 router.get('/files/:filename', controllerTask.getTaskFiles);
 router.get('/:id', controllerTask.getTaskDetail);
 router.get('/:id/:messages', controllerTask.getTaskDetailMessages);
-router.post('/:id', controllerTask.addMessageToTask);
+router.post('/:id', [
+    check('message').escape().trim().isLength({ min: 2 }).withMessage('Сообщение не может быть пустым')
+], controllerTask.addMessageToTask);
 router.put('/:id', controllerTask.updateTask);
 router.delete('/:id', controllerTask.deleteTask);
-
-// get product Reviews
-router.get('/getTaskReviews/:id', controllerTask.getTaskReviews);
 
 module.exports = router

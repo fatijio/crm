@@ -84,7 +84,7 @@ const TaskList = () => {
             dispatch(getTasks());
         }
         getTasksData()
-    }, [])
+    }, [dispatch])
 
     return (
         <>

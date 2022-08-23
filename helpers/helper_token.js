@@ -4,8 +4,11 @@ const jwt = require('jsonwebtoken');
 const { secret_key, access_token_key, refresh_token_key } = require('../config/config');
 
 const generateTokens = async (payloadData) => {
+    console.log('generateTokens', payloadData)
+    console.log('generateTokens----------------userGroup', payloadData.userGroup)
     const payload = { id: payloadData.userId, group: payloadData.userGroup }
     const user = await rToken.findOne({ where: { userId: payload.id } });
+    console.log('generateTokens_user', payloadData)
     if (user) {
         rToken.destroy({
             where: {
@@ -36,13 +39,15 @@ const validateAccessToken = (token) => {
         //console.log('validate access token', userData);
         return userData;
     } catch (e) {
-        return e;
+        //console.log('validateAccessTokenError', e);
+        return false;
     }
 }
 
 const validateRefreshToken = (token) => {
     try {
         const userData = jwt.verify(token, refresh_token_key);
+        //console.log('validateRefreshToken', userData);
         return userData;
     } catch (e) {
         return false;
@@ -52,6 +57,7 @@ const validateRefreshToken = (token) => {
 const findRefreshToken = async (token) => {
     try {
         const refreshToken = await rToken.findOne({ where: { refreshToken: token } });
+        console.log('findRefreshToken', refreshToken);
         return refreshToken;
     } catch (error) {
         console.log(error);

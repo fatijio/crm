@@ -1,10 +1,72 @@
 const db = require('../models')
-const { validateAccessToken } = require('../helpers/helper_token');
+const { validateAccessToken, validateRefreshToken } = require('../helpers/helper_token');
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
 
 const NotifyModel = db.notify;
 
+let clients = [];
+const ADMIN = 3;
+
+const notifySubscribers = (toUser, fromUser, isAdmin, message) => {
+    // Send a message to each subscriber
+    if (isAdmin) {
+        const toClient = clients.find(one => one.id === toUser);
+        if (toClient) {
+            toClient.res.write(`id: ${toClient.id}\n`);
+            toClient.res.write(`data: ${JSON.stringify(message)}\n\n`);
+        }
+    } else {
+        const toAdmin = clients.find(one => one.id === ADMIN);
+        console.log('toAdmin', toAdmin);
+        if (toAdmin) {
+            toAdmin.res.write(`id: ${toAdmin.id}\n`);
+            toAdmin.res.write(`data: ${JSON.stringify(message)}\n\n`);
+        }
+    }
+    /*clients.forEach((client, index) => {
+        //console.log('client', client);
+        if (toUser == client.id && toUser != fromUser) {
+            //if(toUser == fromUser)
+            client.res.write(`data: ${JSON.stringify(message)}\n\n`);
+        }
+        if (fromUser > 1 && client.id == 1) {
+            client.res.write(`data: ${JSON.stringify(message)}\n\n`);
+        }
+    });*/
+};
+
+const getNewData = (req, res) => {
+    const checkToken = req.cookies.refreshToken;
+    let userData = validateRefreshToken(checkToken);
+    //res.setHeader('Access-Control-Allow-Origin', '*');
+    if (userData) {
+        res.writeHead(200, {
+            "Connection": "keep-alive",
+            "Content-Type": "text/event-stream",
+            //"Access-Control-Allow-Origin": '*',
+            "Access-Control-Allow-Credentials": true,
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Cache-Control": "no-cache",
+        });
+
+        const id = userData.id;
+        const client = {
+            id,
+            res,
+        };
+
+        clients.push(client);
+
+        console.log(`Client connected: ${id}`);
+        //console.log('Его res:', client.res);
+        req.on("close", () => {
+            console.log(`Client disconnected: ${id}`);
+            clients = clients.filter((client) => client.id !== id);
+        });
+    }
+
+}
 
 const getUserNotify = async (req, res) => {
     const userAccessToken = req.headers.authorization;
@@ -72,5 +134,7 @@ const deleteUserNotify = async (req, res) => {
 
 module.exports = {
     getUserNotify,
-    deleteUserNotify
+    deleteUserNotify,
+    getNewData,
+    notifySubscribers
 }

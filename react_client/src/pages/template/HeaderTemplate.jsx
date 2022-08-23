@@ -3,7 +3,7 @@ import { Alert, Layout, Avatar, Badge, Drawer, Row, Col, Dropdown, Menu, Space }
 import { UserOutlined, ImportOutlined, BellOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchLogout } from '../../store/slices/authSlice';
-import { getNotifications, deleteNotification } from '../../store/slices/notifySlice';
+import { getNotifications, deleteNotification, setNewNotice } from '../../store/slices/notifySlice';
 
 const { Header } = Layout;
 
@@ -21,7 +21,18 @@ const HeaderTemplate = () => {
 
     useEffect(() => {
         dispatch(getNotifications());
-    }, [])
+        const eventSource = new EventSource('http://localhost:8080/api/notifications/news', { withCredentials: true });
+        eventSource.addEventListener('message', function (e) {
+            dispatch(setNewNotice(JSON.parse(e.data)));
+            //console.log('message', JSON.parse(e.data));
+        }, false);
+        return () => {
+            eventSource.removeEventListener("message");
+            eventSource.close();
+        };
+    }, [dispatch]);
+
+
 
     const topMenu = [
 
@@ -55,7 +66,7 @@ const HeaderTemplate = () => {
         setVisible(false);
     };
     const handleDeleteNotice = (id) => {
-        console.log('id', id)
+        //console.log('id', id)
         dispatch(deleteNotification(id))
     }
 

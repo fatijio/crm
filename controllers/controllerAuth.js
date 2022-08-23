@@ -92,16 +92,19 @@ const logoutUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
     const { refreshToken } = req.cookies;
+    //console.log('refreshToken', refreshToken);
     const userData = validateRefreshToken(refreshToken);
-    const tokenFromDatabase = findRefreshToken(refreshToken);
-    //console.log(userData);
+    const user = await getOneUserInfo(userData.id);
+    //console.log('user------------->', user);
+    //const tokenFromDatabase = findRefreshToken(refreshToken);
+    //console.log('userData------------------', userData);
+    //console.log('tokenFromDatabase------------------', tokenFromDatabase);
 
-    if (!userData || !tokenFromDatabase) {
+    if (!userData) {
         return res.status(404).send('Нет такого рефреша, надо войти заново');
     }
-    const tokens = await generateTokens(userData.id);
+    const tokens = await generateTokens({ userId: userData.id, userGroup: user.group_id });
     res.cookie('refreshToken', tokens.refresh_token, { maxAge: 51 * 60 * 60 * 1000, httpOnly: true });
-
     return res.status(200).send({
         ...tokens,
         user: userData.id
@@ -111,11 +114,12 @@ const refreshToken = async (req, res) => {
 const accessExpire = async (req, res) => {
     const query = req.query;
     const response = validateAccessToken(query.token);
+    //console.log('response', response);
     if (response === false) {
-        return res.json(false);
+        return res.json({ type: 'error', message: 'Необходимо заново авторизоваться' });
     }
     const userInfo = await getOneUserInfo(response.id);
-    //console.log('userInfo', userInfo)
+    //console.log('userInfo', userInfo);
     return res.status(200).json({ isAuth: true, user: userInfo });
 }
 

@@ -32,8 +32,8 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-db.products = require('./productModel.js')(sequelize, DataTypes)
-db.reviews = require('./reviewModel.js')(sequelize, DataTypes)
+//db.products = require('./productModel.js')(sequelize, DataTypes)
+//db.reviews = require('./reviewModel.js')(sequelize, DataTypes)
 db.users = require('./modelUser.js')(sequelize, DataTypes)
 db.tasks = require('./modelTasks.js')(sequelize, DataTypes)
 db.refreshes = require('./modelRefreshToken.js')(sequelize, DataTypes)

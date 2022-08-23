@@ -1,7 +1,7 @@
 const db = require('../models');
 const User = db.users;
-const jwt = require('jsonwebtoken');
-const { secret_key, access_token_key, refresh_token_key } = require('../config/config');
+//const jwt = require('jsonwebtoken');
+//const { secret_key, access_token_key, refresh_token_key } = require('../config/config');
 
 const getOneUserInfo = async (userid) => {
     try {

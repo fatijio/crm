@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import EditProduct from './screens/EditProduct'
-import EditTask from './components/EditTask'
 import TaskDetailPage from './pages/TaskDetailPage';
 import InfoPage from './pages/InfoPage';
 import TaskList from './pages/TasksPage';
@@ -30,16 +28,8 @@ const App = () => {
     if (access_token) {
       //dispatch(actionCheckAuth(access_token));
       dispatch(fetchAuth(access_token));
-      //subscribe();
     }
   }, [isAuth]);
-
-  /*const subscribe = () => {
-    const eventSource = new EventSource('/api/notifications');
-    eventSource.onmessage = function (event) {
-      console.log('event_source', event.data);
-    }
-  }*/
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

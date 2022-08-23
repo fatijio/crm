@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router'
 import { Descriptions, Divider, Input, Form, Button, PageHeader, Avatar, Tooltip, Comment, Upload, Space } from 'antd';
@@ -32,10 +32,11 @@ const Editor = ({ onChange, onSubmit, submitting, value, getMessages }) => (
 
 const TaskDetail = () => {
 
-    const { id } = useParams()
+    const { id } = useParams();
     const userName = useSelector(state => state.auth.login).substr(0, 1);
-    //const history = useNavigate()
+    const chatBlock = useRef();
 
+    //const history = useNavigate()
     //console.log(id);
 
     const [title, setTitle] = useState('');
@@ -51,7 +52,6 @@ const TaskDetail = () => {
     //const [error, setError] = useState('');
 
     useEffect(() => {
-
         const getTaskDetail = async () => {
             const { data } = await axios.get(`/api/tasks/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('u-access')}` } });
             //console.log('data', data);
@@ -63,29 +63,27 @@ const TaskDetail = () => {
             setMessages(data.taskMessages);
             if (data.taskDetail.files) {
                 setFiles(data.taskDetail.files.split(','));
-
                 //console.log('files', data.taskDetail.files.split(','));
-
                 const convertFiles = () => {
                     const replacedVal = data.taskDetail.files.split(',');
                     const filesList = replacedVal.map(item => {
                         //console.log(item);
                         return { filename: item.replace('filename: ', '') }
                     });
-
                     //console.log(filesList);
                     setFiles(filesList);
                 }
                 convertFiles();
             }
-
-
-            // for reviews
-            //setReviews(data.review)
         }
-        getTaskDetail()
-
+        getTaskDetail();
     }, [id]);
+
+    useLayoutEffect(() => {
+        setTimeout(() => {
+            chatBlock.current.scrollTop = chatBlock.current.scrollHeight;
+        }, 100)
+    }, []);
 
     const handleSendMessage = async () => {
         const messageData = {
@@ -93,14 +91,28 @@ const TaskDetail = () => {
             taskId: id
         }
         setSendStatus(true);
-        const sendData = await axios.post(`/api/tasks/${id}`, messageData, {
+        await axios.post(`/api/tasks/${id}`, messageData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('u-access')}`,
             }
         })
+            .then((response) => {
+                //console.log('res', response)
+                setMessages([
+                    ...messages,
+                    response.data
+                ])
+                setMessage('');
+                setSendStatus(false);
+            })
             .catch((error) => {
-                return error.response.data;
+                //return error.response.data;
+                openNotification('error', error.response.data);
+                setSendStatus(false);
+                //console.log('error.response.data', error.response.data);
+                //return;
             });
+        /*console.log('sendData', sendData);
         if (sendData.error) {
             openNotification('error', sendData.msg);
             setSendStatus(false);
@@ -111,10 +123,10 @@ const TaskDetail = () => {
             sendData.data
         ])
         setMessage('');
-        setSendStatus(false);
+        setSendStatus(false);*/
     }
 
-    // for test
+    // download file on client
     const getFile = async (name) => {
         //console.log('file name', name);
         await axios.get(`/api/tasks/files/${name}`, {
@@ -179,13 +191,13 @@ const TaskDetail = () => {
             </div>
 
             <div className="task_detail_message_block">
-                <div className="messages_block">
+                <div className="messages_block" ref={chatBlock}>
 
                     {!messages ? ' ' :
 
                         messages.map((data) => {
                             let color = '';
-                            color = (data.user.fio === 'Менеджер') ? color = '#7cb736' : color = '#57b0ff';
+                            color = (data.user.group_id === 1) ? color = '#7cb736' : color = '#57b0ff';
                             return (
                                 <div key={data.createdAt + data.id}>
                                     < Comment

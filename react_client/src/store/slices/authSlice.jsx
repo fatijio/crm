@@ -23,7 +23,8 @@ export const fetchAuth = createAsyncThunk(
     async function (token, { rejectWithValue }) {
         try {
             const checkAccess = await axios.get('/api/auth/access', { params: { token: token } });
-            if (!checkAccess.data) {
+            //console.log('checkAccess', checkAccess);
+            if (checkAccess.data.type === 'error') {
                 const response = await axios.get('/api/auth/refresh', { withCredentials: true });
                 //console.log('going to refresh', response);
                 if (!response) {
@@ -35,6 +36,7 @@ export const fetchAuth = createAsyncThunk(
             //console.log(checkAccess.data);
             return checkAccess.data;
         } catch (error) {
+            //console.log('error.response.data', error.response.data);
             return rejectWithValue(error.response.data);
         }
 

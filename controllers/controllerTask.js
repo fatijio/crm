@@ -56,7 +56,7 @@ const addTask = async (req, res) => {
         const savedTask = await Task.findAll({
             attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
             where: { /*userId: userAccessTokenCheck.id*/ id: task.id },
-            include: [{ model: Status, attributes: ['name'] }, { model: Category, attributes: ['name'] }]
+            include: [{ model: Status, attributes: ['id', 'name', 'color'] }, { model: Category, attributes: ['id', 'name'] }]
 
         });
         //console.log('contoller/addTask', task.id);
@@ -151,10 +151,11 @@ const getTaskDetail = async (req, res) => {
 
         //console.log('taskDetail', taskDetail);
 
+        // Messages for task
         const taskMessages = await Message.findAll({
             attributes: ['id', 'message', 'createdAt'],
             where: { task_id: taskId, published: 1 },
-            include: [{ model: User, attributes: ['fio'] }]
+            include: [{ model: User, attributes: ['fio', 'group_id'] }]
         });
 
         //console.log('taskMessages', taskMessages);
@@ -198,6 +199,16 @@ const deleteTask = async (req, res) => {
 
 // add messages to task
 const addMessageToTask = async (req, res) => {
+    const errors = validationResult(req);
+    //console.log('errors', errors);
+    if (!errors.isEmpty()) {
+        const result = errors.array().map(item => {
+            //console.log(item.msg);
+            return item.msg;
+        }
+        );
+        return res.status(400).json(result);
+    }
 
     //console.log('message body', req.body);
     const userAccessToken = req.headers.authorization;
@@ -206,6 +217,7 @@ const addMessageToTask = async (req, res) => {
     const message = req.body.message;
     const taskId = req.body.taskId;
     let checkUserId = '';
+    let isAdmin = false;
 
     if (/*userAccessTokenCheck.id !== 1 &&*/ userAccessTokenCheck.group !== 1) {
         const checkAccessTask = await Task.findOne({
@@ -235,6 +247,9 @@ const addMessageToTask = async (req, res) => {
     const createMessage = await Message.create(messageBody);
 
     if (userAccessTokenCheck.group == 1) {
+
+        isAdmin = true;
+
         checkUserId = await Task.findOne({
             attributes: ['userId'],
             //include: []
@@ -245,7 +260,7 @@ const addMessageToTask = async (req, res) => {
         //console.log('checkUserId', checkUserId.userId);
     }
     //console.log('message', message);
-    sendMessageNotify(taskId, message, checkUserId ? checkUserId.userId : userAccessTokenCheck.id, userAccessTokenCheck.id);
+    sendMessageNotify(taskId, message, checkUserId ? checkUserId.userId : userAccessTokenCheck.id, userAccessTokenCheck.id, isAdmin);
     //await NotifyModel.create({ message: `Задача № ${taskId} добавлен комментарий`, published: 1, user_id: checkUserId ? checkUserId.userId : userAccessTokenCheck.id, from_user_id: userAccessTokenCheck.id });
 
     //console.log('createMessage', createMessage);
@@ -303,17 +318,6 @@ const getTaskFiles = (req, res) => {
     //return res.status(200).send('ok');
 }
 
-const getTaskReviews = async (req, res) => {
-    const id = req.params.id
-    const data = await Task.findOne({
-        /*include: [{
-            model: Review,
-            as: 'review'
-        }],*/
-        where: { id: id }
-    })
-    res.status(200).send(data)
-}
 // 8. Upload Image Controller
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -353,7 +357,6 @@ module.exports = {
     getTaskDetail,
     getTaskDetailMessages,
     getCategories,
-    getTaskReviews,
     getTaskFiles,
     deleteTask,
     updateTask,
