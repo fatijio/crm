@@ -20,6 +20,11 @@
     text-align: center;
 }
 
+.content_block {
+    box-shadow: 0 20px 27px rgba(0, 0, 0, .05);
+    -webkit-box-shadow: 0 20px 27px rgba(0, 0, 0, .05);
+}
+
 .task_detail_message_block {
     background: #fff;
     padding: 0 20px;
@@ -49,7 +54,6 @@
 
 .file_item {
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
     color: #55afff;
     margin-right: 10px;
@@ -64,6 +68,15 @@
     width: 120px;
 }
 
+.notice_item .ant-alert-message {
+    font-size: 14px;
+}
+
 .notice_item {
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    width: 250px;
+}
+
+.badge_count sup {
+    background-color: #108ee9;
 }

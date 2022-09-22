@@ -5,7 +5,7 @@ const { notifySubscribers } = require('../controllers/controllerNotification');
 
 const sendMessageNotify = async (taskId, descriptionData, toUser, fromUser, isAdmin) => {
     const createdNotice = await NotifyModel.create({
-        message: `Задача № ${taskId} добавлен комментарий`,
+        message: `Комментарий к задаче № ${taskId}`,
         description: descriptionData.length > 30 ? descriptionData.substring(0, 30) + '...' : descriptionData,
         published: 1,
         user_id: toUser,
@@ -16,7 +16,7 @@ const sendMessageNotify = async (taskId, descriptionData, toUser, fromUser, isAd
 
     notifySubscribers(toUser, fromUser, isAdmin, {
         id: createdNotice.id,
-        message: `Задача № ${taskId} добавлен комментарий`,
+        message: `Комментарий к задаче № ${taskId}`,
         description: descriptionData.length > 30 ? descriptionData.substring(0, 30) + '...' : descriptionData
     });
 

@@ -21,7 +21,7 @@ const sequelize = new Sequelize(
 
 sequelize.authenticate()
     .then(() => {
-        console.log('connected..')
+        console.log('Connected..')
     })
     .catch(err => {
         console.log('Error' + err)
@@ -39,9 +39,10 @@ db.tasks = require('./modelTasks.js')(sequelize, DataTypes)
 db.refreshes = require('./modelRefreshToken.js')(sequelize, DataTypes)
 db.status = require('./modelStatusTask.js')(sequelize, DataTypes)
 db.category = require('./modelCategories.js')(sequelize, DataTypes)
-db.message = require('./modelMessage')(sequelize, DataTypes)
-db.groups = require('./modelGroups')(sequelize, DataTypes)
-db.notify = require('./modelNotify')(sequelize, DataTypes)
+db.message = require('./modelMessage.js')(sequelize, DataTypes)
+db.groups = require('./modelGroups.js')(sequelize, DataTypes)
+db.notify = require('./modelNotify.js')(sequelize, DataTypes)
+db.files = require('./modelFiles.js')(sequelize, DataTypes)
 
 //db.sequelize.sync({ force: true }).then(() => { console.log('Все модели были заново созданы.') })
 //db.sequelize.sync({ alter: true }).then(() => { console.log('Все модели были успешно обновлены.') })
@@ -60,6 +61,11 @@ db.reviews.belongsTo(db.products, {
 db.users.belongsTo(db.groups, { foreignKey: 'group_id' });
 db.users.hasMany(db.notify, { foreignKey: 'user_id' });
 db.users.hasMany(db.notify, { foreignKey: 'from_user_id' });
+
+db.files.belongsTo(db.users, { foreignKey: 'user_id' });
+db.tasks.hasMany(db.files, { foreignKey: 'task_id' });
+db.files.belongsTo(db.tasks, { foreignKey: 'task_id' });
+
 
 db.users.hasOne(db.refreshes);
 

@@ -13,6 +13,7 @@ import HeaderTemplate from './pages/template/HeaderTemplate';
 import SiderTemplate from './pages/template/SiderTemplate';
 import FooterTemplate from './pages/template/FooterTemplate';
 import Error404 from './pages/404Page';
+import { getStatuses } from './store/slices/taskSlice';
 
 const { Content } = Layout;
 
@@ -28,6 +29,9 @@ const App = () => {
     if (access_token) {
       //dispatch(actionCheckAuth(access_token));
       dispatch(fetchAuth(access_token));
+      if (group && group === 1) {
+        dispatch(getStatuses());
+      }
     }
   }, [isAuth]);
 
@@ -43,6 +47,7 @@ const App = () => {
               style={{
                 margin: '24px 16px 0',
               }}
+              className="content_block"
             >
               <div
                 className="site-layout-background"

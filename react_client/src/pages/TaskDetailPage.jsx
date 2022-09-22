@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router'
-import { Descriptions, Divider, Input, Form, Button, PageHeader, Avatar, Tooltip, Comment, Upload, Space } from 'antd';
+import { Descriptions, Divider, Input, Form, Button, PageHeader, Avatar, Tooltip, Comment, Upload, Space, Select } from 'antd';
 import { UploadOutlined, MessageOutlined, FileOutlined } from '@ant-design/icons';
 import * as moment from 'moment';
 import 'moment/locale/ru';
@@ -9,6 +9,7 @@ import openNotification from '../components/ErrorPopup';
 import axios from 'axios'
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 const Editor = ({ onChange, onSubmit, submitting, value, getMessages }) => (
     <>
@@ -34,6 +35,8 @@ const TaskDetail = () => {
 
     const { id } = useParams();
     const userName = useSelector(state => state.auth.login).substr(0, 1);
+    const group = useSelector(state => state.auth.group);
+    const statuses = useSelector(state => state.task.statuses);
     const chatBlock = useRef();
 
     //const history = useNavigate()
@@ -42,7 +45,7 @@ const TaskDetail = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [created, setCreated] = useState('');
-    const [status, setStatus] = useState('');
+    const [currentStatus, setCurrentStatus] = useState({});
     const [category, setCategory] = useState('');
     const [messages, setMessages] = useState([]);
     const [files, setFiles] = useState([]);
@@ -58,10 +61,11 @@ const TaskDetail = () => {
             setTitle(data.taskDetail.title);
             setDescription(data.taskDetail.description);
             setCreated(data.taskDetail.createdAt);
-            setStatus(data.taskDetail.status.name);
+            setCurrentStatus(data.taskDetail.status);
             setCategory(data.taskDetail.category.name);
             setMessages(data.taskMessages);
-            if (data.taskDetail.files) {
+            setFiles(data.taskDetail.files);
+            /*if (data.taskDetail.files) {
                 setFiles(data.taskDetail.files.split(','));
                 //console.log('files', data.taskDetail.files.split(','));
                 const convertFiles = () => {
@@ -74,7 +78,7 @@ const TaskDetail = () => {
                     setFiles(filesList);
                 }
                 convertFiles();
-            }
+            }*/
         }
         getTaskDetail();
     }, [id]);
@@ -125,19 +129,38 @@ const TaskDetail = () => {
         setMessage('');
         setSendStatus(false);*/
     }
+    //console.log('Statuses', statuses);
+    const handleChangeStatus = async (statusId) => {
+        const data = {
+            id: id,
+            status_id: statusId
+        }
+        const updateStatus = await axios.put(`/api/tasks/${id}`,
+            data,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('u-access')}`,
+                }
+            });
+
+        if (updateStatus.data[0] === 1) {
+            let newStatus = statuses.filter(item => item.id === statusId);
+            setCurrentStatus(...newStatus);
+        }
+    }
 
     // download file on client
     const getFile = async (name) => {
         //console.log('file name', name);
-        await axios.get(`/api/tasks/files/${name}`, {
+        await axios.get(`/api/tasks/${id}/${name}`, {
             responseType: 'blob',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('u-access')}`,
                 'Content-type': 'application/octet-stream'
-            }
+            },
         })
-            .then(data => {
-                let url = URL.createObjectURL(data.data);
+            .then(res => {
+                let url = URL.createObjectURL(res.data);
                 //setPreview(url.replace('blob:', '').toString());
                 let anchor = document.createElement('a');
                 anchor.href = url;
@@ -146,11 +169,14 @@ const TaskDetail = () => {
                 anchor.style = 'display:none';
                 anchor.click();
                 anchor.remove();
+
+                //console.log('url', url)
                 URL.revokeObjectURL(url);
-                //console.log('url', url.replace('blob:', ''))
             });
 
+        //return link;
     }
+
     // for test
     const getMoreMessages = async () => {
         const count = 10;
@@ -168,7 +194,23 @@ const TaskDetail = () => {
                 >
                     <Descriptions size="small" column={1} bordered>
                         <Descriptions.Item label="Дата создания">{moment(created).local().format('DD.MM.YYYY HH:mm')}</Descriptions.Item>
-                        <Descriptions.Item label="Статус">{status}</Descriptions.Item>
+                        <Descriptions.Item label="Статус">
+                            {group === 1 ?
+                                <Select
+                                    value={currentStatus.id}
+                                    onChange={handleChangeStatus}
+
+                                >
+                                    {statuses.map(status =>
+                                        <Option key={status.id} value={status.id}>{status.name}</Option>
+                                    )}
+
+                                </Select>
+
+                                :
+                                currentStatus.name
+                            }
+                        </Descriptions.Item>
                         <Descriptions.Item label="Категория">{category}</Descriptions.Item>
                         <Descriptions.Item label="Описание">
                             {description}
@@ -177,9 +219,8 @@ const TaskDetail = () => {
                             {!files ? '' : files.map(item => {
                                 return (
                                     <div className="file_item" key={item.filename}>
-                                        <FileOutlined style={{ fontSize: '2.5em' }} onClick={() => getFile(item.filename)} />
-                                        <a href={item.filename}  >
-                                            {item.filename}</a>
+                                        <FileOutlined style={{ fontSize: '2em' }} onClick={() => getFile(item.filename)} />
+                                        <a target="_blank" rel="noreferrer" href={item.filename} title={item.originalname}>{item.originalname}</a>
                                     </div>
                                 )
                             })}

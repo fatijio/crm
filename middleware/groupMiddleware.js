@@ -1,7 +1,6 @@
 const { validateAccessToken } = require('../helpers/helper_token');
 
 module.exports = function (groups) {
-
     return function (req, res, next) {
         try {
             const authHeader = req.headers.authorization;
@@ -18,9 +17,7 @@ module.exports = function (groups) {
             }
             next();
         } catch (e) {
-            return next('Что то не так с проверкой прав');
+            return res.status(403).json('Что то не так с проверкой прав');
         }
-
     }
-
 }

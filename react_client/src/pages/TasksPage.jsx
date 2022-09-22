@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import ModalTask from '../components/ModalTask';
 import { getTasks } from '../store/slices/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import openNotification from '../components/ErrorPopup';
 
 const columns = [
     {
@@ -12,6 +13,7 @@ const columns = [
         key: 'id',
         dataIndex: 'id',
         sorter: (a, b) => a.id - b.id,
+        showSorterTooltip: false
     },
     {
         title: 'Дата создания',
@@ -74,31 +76,28 @@ const columns = [
 ];
 
 const TaskList = () => {
-
     //const [tasks, setTasks] = useState([]);
     const dispatch = useDispatch();
-    const { loading, tasks } = useSelector(state => state.task);
-
+    const { loading, tasks, error } = useSelector(state => state.task);
     useEffect(() => {
-        const getTasksData = async () => {
+        if (error) {
+            openNotification('error', error.message);
+        } else {
             dispatch(getTasks());
         }
-        getTasksData()
-    }, [dispatch])
+    }, []);
 
     return (
         <>
             <Row justify="space-between">
-
                 <Col lg={16}><Typography.Title level={3}>Задачи</Typography.Title></Col>
                 <Col>
                     <ModalTask />
                 </Col>
-
             </Row>
             <Row>
                 <Col lg={24}>
-                    < Table columns={columns} dataSource={tasks.empty ? [] : tasks} loading={loading} size="middle" />
+                    < Table locale="ru" columns={columns} dataSource={tasks.empty ? [] : tasks} loading={loading} size="middle" />
                 </Col>
             </Row>
         </>

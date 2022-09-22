@@ -14,13 +14,13 @@ router.post('/addTask', controllerTask.upload, [
 ], controllerTask.addTask);
 router.get('/allTasks', controllerTask.getAllTasks);
 router.get('/categories', controllerTask.getCategories);
-router.get('/files/:filename', controllerTask.getTaskFiles);
+router.get('/:id/:filename', controllerTask.getTaskFiles);
 router.get('/:id', controllerTask.getTaskDetail);
 router.get('/:id/:messages', controllerTask.getTaskDetailMessages);
 router.post('/:id', [
     check('message').escape().trim().isLength({ min: 2 }).withMessage('Сообщение не может быть пустым')
 ], controllerTask.addMessageToTask);
-router.put('/:id', controllerTask.updateTask);
+router.put('/:id', groupMiddleware(1), controllerTask.updateTask);
 router.delete('/:id', controllerTask.deleteTask);
 
 module.exports = router

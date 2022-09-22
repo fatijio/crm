@@ -2,11 +2,13 @@ const db = require('../models')
 const { validateAccessToken } = require('../helpers/helper_token');
 const { sendMessageNotify } = require('../helpers/helper_notify');
 const { validationResult } = require('express-validator');
+const { getOwnerTask } = require('../helpers/helper_user');
 
 // image Upload
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
 
 // create main Model
 const Task = db.tasks;
@@ -14,6 +16,7 @@ const Status = db.status;
 const Category = db.category;
 const Message = db.message;
 const User = db.users;
+const File = db.files;
 //const Review = db.comments
 
 // 1. create task
@@ -34,16 +37,12 @@ const addTask = async (req, res) => {
     const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1])
     //console.log('acc', userAccessTokenCheck);
     //console.log('path', req.files)
-    const collection = req.files.map(file => {
-        let result = file.filename;
-        //console.log(image.path);
-        return result;
-    });
-    //console.log(collection.toString());
+    const collectionFiles = req.files;
+    console.log('collection files', collectionFiles);
     //return;
 
     let taskBody = {
-        files: collection.toString(),
+        //files: collection.toString(),
         title: req.body.title,
         status_id: 1,
         category_id: Number(req.body.category_id),
@@ -59,6 +58,16 @@ const addTask = async (req, res) => {
             include: [{ model: Status, attributes: ['id', 'name', 'color'] }, { model: Category, attributes: ['id', 'name'] }]
 
         });
+        if (task) {
+            collectionFiles.map(file => {
+                file.user_id = userAccessTokenCheck.id,
+                    file.task_id = task.id,
+                    file.published = 1,
+                    file.types = file.mimetype
+            })
+            const taskFiles = await File.bulkCreate(collectionFiles);
+            console.log('taskFilesCreated', taskFiles);
+        }
         //console.log('contoller/addTask', task.id);
         //console.log('contoller/addTask', savedTask[0].dataValues);
         return res.status(200).json({ task: savedTask[0].dataValues, msg: 'Задача создана' });
@@ -71,13 +80,22 @@ const addTask = async (req, res) => {
 
 // 2. get all tasks
 const getAllTasks = async (req, res) => {
+    const userAccessToken = req.headers.authorization;
+    const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1]);
+    //console.log('getAllTasks', req);
+    if (req.query.statuses === 'get') {
+        if (userAccessTokenCheck.group === 1) {
+            const query = {
+                attributes: ['id', 'name'],
+                where: { active: 1 }
+            }
+            const statusesList = await Status.findAll(query);
+            return res.status(200).json(statusesList)
+        }
+    }
     try {
-        const userAccessToken = req.headers.authorization;
-        const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1]);
         let query = '';
-
-        // if user id 1 and has group 1 then hi is admin
-        if (/*userAccessTokenCheck.id === 1 && */userAccessTokenCheck.group === 1) {
+        if (userAccessTokenCheck.group === 1) {
             query = {
                 attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
                 include: [{ model: Status, attributes: ['id', 'name', 'color'] }, { model: Category, attributes: ['id', 'name'] }],
@@ -96,17 +114,12 @@ const getAllTasks = async (req, res) => {
             }
         }
 
-
         let tasks = await Task.findAll(query);
 
         //console.log('tasks', tasks);
         if (tasks.length == 0) {
             return res.json({ empty: 'Нет данных' });
         }
-        /*for (let task of tasks) {
-            task.dataValues.key = task.id;
-        }*/
-
         return res.status(200).json(tasks)
     } catch (error) {
         return res.status(401).json('У Вас нет доступа к задачам');
@@ -125,22 +138,26 @@ const getTaskDetail = async (req, res) => {
 
         if (/*userAccessTokenCheck.id === 1 &&*/ userAccessTokenCheck.group === 1) {
             query = {
-                attributes: ['id', 'title', 'description', 'files', 'createdAt', ['id', 'key']],
+                attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
                 where: { id: taskId },
                 include: [
                     { model: Status, attributes: ['id', 'name', 'color'] },
                     { model: Category, attributes: ['id', 'name'] },
+                    { model: File, attributes: ['filename', 'originalname'] },
                     //{ model: Message, where: { published: 1 }, attributes: ['id', 'message', 'createdAt'], include: [{ model: User, attributes: ['fio'] }] },
                 ]
 
             }
+
+            //console.log('query', query);
         } else {
             query = {
-                attributes: ['id', 'title', 'description', 'files', 'createdAt', ['id', 'key']],
+                attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
                 where: { userId: userId, id: taskId },
                 include: [
                     { model: Status, attributes: ['id', 'name', 'color'] },
                     { model: Category, attributes: ['id', 'name'] },
+                    { model: File, attributes: ['filename', 'originalname'] }
                     //{ model: Message, where: { published: 1 }, attributes: ['id', 'message', 'createdAt'], include: [{ model: User, attributes: ['fio'] }] },
                 ]
 
@@ -151,6 +168,10 @@ const getTaskDetail = async (req, res) => {
 
         //console.log('taskDetail', taskDetail);
 
+        if (taskDetail.length == 0) {
+            return res.json({ empty: 'Нет данных' });
+        }
+
         // Messages for task
         const taskMessages = await Message.findAll({
             attributes: ['id', 'message', 'createdAt'],
@@ -159,14 +180,6 @@ const getTaskDetail = async (req, res) => {
         });
 
         //console.log('taskMessages', taskMessages);
-
-
-        if (taskDetail.length == 0) {
-            return res.json({ empty: 'Нет данных' });
-        }
-        /*for (let task of tasks) {
-            task.dataValues.key = task.id;
-        }*/
 
         return res.status(200).json({ taskDetail: taskDetail, taskMessages: taskMessages ? taskMessages : 0 })
     } catch (error) {
@@ -186,9 +199,11 @@ const getCategories = async (req, res) => {
 
 // 4. update task
 const updateTask = async (req, res) => {
-    let id = req.params.id
-    const task = await Task.update(req.body, { where: { id: id } })
-    res.status(200).send(task)
+    let id = req.params.id;
+    //console.log('updateTask', req.body);
+    //console.log('updateTask_params', req.params);
+    const task = await Task.update(req.body, { where: { id: id } });
+    res.status(200).send(task);
 }
 // 5. delete task by id
 const deleteTask = async (req, res) => {
@@ -280,11 +295,22 @@ const addMessageToTask = async (req, res) => {
 }
 
 // get files of task
-const getTaskFiles = (req, res) => {
-    console.log('params', req.params.filename);
+const getTaskFiles = async (req, res) => {
+    //console.log('params', req.params.filename);
+    //console.log('params2', req.params);
+    const idTask = req.params.id;
+    const userAccessToken = req.headers.authorization;
+    const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1]);
+    //console.log('userAccessTokenCheck', userAccessTokenCheck);
+    let userFolder = userAccessTokenCheck.id;
+    //console.log('req', req);
+    if (userAccessTokenCheck.group === 1) {
+        userFolder = await getOwnerTask(idTask);
+        //console.log('userFolder', userFolder);
+    }
     const fileName = req.params.filename;
-    const dir = __basedir + '/upload/1/';
-    console.log('dir', dir);
+    const dir = __basedir + `/upload/${userFolder}/`;
+    //console.log('dir', dir);
     var options = {
         root: dir,
         dotfiles: 'deny',
@@ -311,11 +337,6 @@ const getTaskFiles = (req, res) => {
             }
         }
     });
-    /*const filePath = path.join(__basedir, dir, fileName.filename);
-    console.log('filePath', filePath);
-    res.sendFile(filePath);*/
-
-    //return res.status(200).send('ok');
 }
 
 // 8. Upload Image Controller
@@ -346,6 +367,7 @@ const upload = multer({
         if (mimeType && extname) {
             return cb(null, true)
         }
+        console.log('не принимаем файл: ', file.originalname);
         cb('Неверный формат или размер файла')
     }
 }).array('files', 5)

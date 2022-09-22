@@ -6,10 +6,11 @@ const { Op } = require('sequelize');
 const NotifyModel = db.notify;
 
 let clients = [];
-const ADMIN = 3;
+//const ADMIN = 3;
 
 const notifySubscribers = (toUser, fromUser, isAdmin, message) => {
     // Send a message to each subscriber
+    //console.log('clients', clients);
     if (isAdmin) {
         const toClient = clients.find(one => one.id === toUser);
         if (toClient) {
@@ -17,12 +18,19 @@ const notifySubscribers = (toUser, fromUser, isAdmin, message) => {
             toClient.res.write(`data: ${JSON.stringify(message)}\n\n`);
         }
     } else {
-        const toAdmin = clients.find(one => one.id === ADMIN);
-        console.log('toAdmin', toAdmin);
-        if (toAdmin) {
+        //const toAdmin = clients.find(one => one.id === ADMIN);
+        //console.log('toAdmin', toAdmin);
+        clients.forEach((client) => {
+            if (client.group === 1) {
+                console.log('client_uid', client.uid);
+                client.res.write(`id: ${client.uid}\n`);
+                client.res.write(`data: ${JSON.stringify(message)}\n\n`);
+            }
+        });
+        /*if (toAdmin) {
             toAdmin.res.write(`id: ${toAdmin.id}\n`);
             toAdmin.res.write(`data: ${JSON.stringify(message)}\n\n`);
-        }
+        }*/
     }
     /*clients.forEach((client, index) => {
         //console.log('client', client);
@@ -50,19 +58,24 @@ const getNewData = (req, res) => {
             "Cache-Control": "no-cache",
         });
 
+        //console.log('userData', userData);
+
         const id = userData.id;
+        const uid = Date.now();
         const client = {
             id,
+            uid,
+            group: userData.group,
             res,
         };
 
         clients.push(client);
 
-        console.log(`Client connected: ${id}`);
+        console.log(`Client connected: ${uid}`);
         //console.log('Его res:', client.res);
         req.on("close", () => {
-            console.log(`Client disconnected: ${id}`);
-            clients = clients.filter((client) => client.id !== id);
+            console.log(`Client disconnected: ${uid}`);
+            clients = clients.filter((client) => client.id !== uid);
         });
     }
 

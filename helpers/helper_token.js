@@ -4,18 +4,18 @@ const jwt = require('jsonwebtoken');
 const { secret_key, access_token_key, refresh_token_key } = require('../config/config');
 
 const generateTokens = async (payloadData) => {
-    console.log('generateTokens', payloadData)
-    console.log('generateTokens----------------userGroup', payloadData.userGroup)
+    //console.log('generateTokens', payloadData)
+    //console.log('generateTokens----------------userGroup', payloadData.userGroup)
     const payload = { id: payloadData.userId, group: payloadData.userGroup }
     const user = await rToken.findOne({ where: { userId: payload.id } });
-    console.log('generateTokens_user', payloadData)
-    if (user) {
+    //console.log('generateTokens_user', payloadData)
+    /*if (user) {
         rToken.destroy({
             where: {
                 userId: payload.id
             }
         });
-    }
+    }*/
     const access_token = jwt.sign(payload, access_token_key, { expiresIn: "1h" });
     const refresh_token = jwt.sign(payload, refresh_token_key, { expiresIn: "2d" });
     try { //17.08.2022 добавил блок try catch для отлова проблем с созданием refresh токена
