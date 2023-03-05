@@ -9,7 +9,7 @@ const FooterTemplate = () => {
                 textAlign: 'center',
             }}
         >
-            CRM Task 2022
+            CRM Task 2023
         </Footer>
     )
 }

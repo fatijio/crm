@@ -55,7 +55,7 @@ const notifySlice = createSlice({
             console.log('action_id', action.payload);
             state.messages = state.messages.filter(notice => {
                 //console.log('filter', notice)
-                return notice.id != action.payload;
+                return notice.id !== action.payload;
             });
         }
 
