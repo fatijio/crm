@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import logo from './../../../src/crm_logo.png';
-import { HomeOutlined, ProfileOutlined, SettingOutlined, TeamOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { HomeOutlined, SettingOutlined, TeamOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 const { Sider } = Layout;
 
 const menuItems = [
@@ -20,7 +20,7 @@ const SiderTemplate = ({ group }) => {
         if (group === 1) {
             return menuItems;
         }
-        return menuItems.filter(item => item.group != 1)
+        return menuItems.filter(item => item.group !== 1)
 
     }
 

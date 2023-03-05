@@ -176,7 +176,11 @@ const getTaskDetail = async (req, res) => {
         const taskMessages = await Message.findAll({
             attributes: ['id', 'message', 'createdAt'],
             where: { task_id: taskId, published: 1 },
-            include: [{ model: User, attributes: ['fio', 'group_id'] }]
+            include: [{ model: User, attributes: ['fio', 'group_id'] }],
+            order: [
+                // We start the order array with the model we want to sort
+                ['id', 'ASC']
+            ]
         });
 
         //console.log('taskMessages', taskMessages);
@@ -279,6 +283,8 @@ const addMessageToTask = async (req, res) => {
     //await NotifyModel.create({ message: `Задача № ${taskId} добавлен комментарий`, published: 1, user_id: checkUserId ? checkUserId.userId : userAccessTokenCheck.id, from_user_id: userAccessTokenCheck.id });
 
     //console.log('createMessage', createMessage);
+
+    // Save sended message with chat
     const savedMessage = await Message.findOne({
         attributes: ['id', 'message', 'user_id', 'task_id', 'createdAt', ['id', 'key']],
         where: {
@@ -287,7 +293,7 @@ const addMessageToTask = async (req, res) => {
             task_id: createMessage.dataValues.task_id,
             published: 1
         },
-        include: [{ model: User, attributes: ['fio'] }]
+        include: [{ model: User, attributes: ['fio', 'group_id'] }]
 
     });
 
