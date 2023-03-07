@@ -1,11 +1,13 @@
-import { Space, Typography, Tag } from 'antd';
+import { Col, Row, Typography, Tag } from 'antd';
 import React from 'react';
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 const InfoPage = () => {
     return (
         <div>
-            <h1>Справка</h1>
+            <Row justify="space-between">
+                <Col lg={16}><Typography.Title level={3}>Справка</Typography.Title></Col>
+            </Row>
             <Text>
                 Для создания задачи необходимо перейти на страницу Задачи и нажать кнопку Создать задачу.<br />
                 Далее заполнить Заголовок (Тема задачи) и Описание (подробное описание задачи), при небходимости приложите файлы к задаче,<br />

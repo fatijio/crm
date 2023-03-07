@@ -2,6 +2,16 @@
     padding: 10px 20px;
 }
 
+@media(max-width: 1040px) {
+    .ant-table-content {
+        overflow-y: scroll;
+    }
+}
+
+.ant-table-container::after {
+    box-shadow: none !important;
+}
+
 #components-layout-demo-responsive .logo {
     height: 32px;
     margin: 16px;
@@ -9,7 +19,7 @@
 }
 
 .site-layout-sub-header-background {
-    background: #fff;
+    background: #fff !important;
 }
 
 .site-layout-background {
@@ -54,6 +64,7 @@
 
 .file_item {
     display: inline-flex;
+    cursor: pointer;
     align-items: center;
     color: #55afff;
     margin-right: 10px;
@@ -79,4 +90,5 @@
 
 .badge_count sup {
     background-color: #108ee9;
+    box-shadow: none !important;
 }
