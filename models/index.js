@@ -1,5 +1,6 @@
 const dbConfig = require('../config/dbConfig.js');
 const { Sequelize, DataTypes } = require('sequelize');
+
 const sequelize = new Sequelize(
     dbConfig.DB,
     dbConfig.USER,
@@ -44,8 +45,45 @@ db.groups = require('./modelGroups.js')(sequelize, DataTypes)
 db.notify = require('./modelNotify.js')(sequelize, DataTypes)
 db.files = require('./modelFiles.js')(sequelize, DataTypes)
 
-//db.sequelize.sync({ force: true }).then(() => { console.log('Все модели были заново созданы.') })
-//db.sequelize.sync({ alter: true }).then(() => { console.log('Все модели были успешно обновлены.') })
+// Создание первоначальных справочников
+// db.sequelize.sync({ force: true }).then(() => {
+  
+//   // Статусы
+//   db.status.bulkCreate([
+//     { name: 'Обработка', color: '#bfbfbf', published: true },
+//     { name: 'В работе', color: '#69b1ff', published: true },
+//     { name: 'Доработка', color: '#36cfc9', published: true },
+//     { name: 'Выполнено', color: '#52c41a', published: true }
+//   ]).then(() => {
+//     console.log('Создание списка статусов закончено');
+//   }).catch(error => {
+//     console.log('status creator', error)
+//   });
+
+//   // Категории
+//   db.category.bulkCreate([
+//     { name: 'Разработка', description: 'Разработка приложений и компонентов', published: true },
+//     { name: 'Тестирование', description: 'Тестирование приложений и компонентов', published: true },
+//     { name: 'Обновление', description: 'Обновление приложений и компонентов', published: true },
+//   ]).then(() => {
+//     console.log('Создание списка категорий закончено');
+//   }).catch(error => {
+//     console.log('category creator', error)
+//   });
+
+//   // Группы пользователей
+//   db.groups.bulkCreate([
+//     { name: 'Администратор', published: true },
+//     { name: 'Пользователь', published: true },
+//   ]).then(() => {
+//     console.log('Создание списка групп закончено');
+//   }).catch(error => {
+//     console.log('group creator', error)
+//   });
+//   console.log('Все модели были заново созданы.') });
+
+// Обновление текущих таблиц
+//db.sequelize.sync({ alter: true }).then(() => { console.log('Все модели были успешно обновлены.') });
 
 /*db.products.hasMany(db.reviews, {
     foreignKey: 'product_id',
@@ -83,6 +121,5 @@ db.message.belongsTo(db.users, { foreignKey: 'user_id' });
 
 db.tasks.hasMany(db.message, { foreignKey: 'task_id' });
 db.message.belongsTo(db.tasks, { foreignKey: 'task_id' });
-
 
 module.exports = db

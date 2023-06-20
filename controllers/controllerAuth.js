@@ -24,7 +24,14 @@ const registerUser = async (req, res) => {
             login: login,
             email: req.body.email,
             password: hashPassword,
-            fio: req.body.fio,
+            name: req.body.name,
+            middleName: req.body.middleName,
+            lastName: req.body.lastName,
+            city: req.body.city,
+            phone: req.body.phone,
+            birthDate: req.body.birthDate,
+            profession: req.body.profession,
+            post: req.body.post,
             published: true,
             group_id: 2
         }
@@ -44,7 +51,9 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({
+                where: { email: email },
+            });
         //console.log('user_data', user);
         //console.log('user_group', user.group.name);
 
@@ -62,9 +71,11 @@ const loginUser = async (req, res) => {
 
         res.cookie('refreshToken', tokens.refresh_token, { maxAge: 51 * 60 * 60 * 1000, httpOnly: true }); // 48 hours
 
+        delete user.dataValues.password;
+
         return res.status(200).send({
             ...tokens,
-            user: user.fio,
+            user: user,
         })
 
     } catch (e) {
@@ -119,7 +130,7 @@ const accessExpire = async (req, res) => {
         return res.json({ type: 'error', message: 'Необходимо заново авторизоваться' });
     }
     const userInfo = await getOneUserInfo(response.id);
-    //console.log('userInfo', userInfo);
+    console.log('userInfo', userInfo);
     return res.status(200).json({ isAuth: true, user: userInfo });
 }
 

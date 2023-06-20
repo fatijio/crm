@@ -6,8 +6,9 @@ const Task = db.tasks;
 
 const getOneUserInfo = async (userid) => {
     try {
-        let user = await User.findOne({ attributes: ['login', 'fio', 'group_id'], where: { id: userid } })
+        let user = await User.findOne({ where: { id: userid } })
         //console.log(user.dataValues)
+        delete user.dataValues.password;
         return user.dataValues;
     } catch (error) {
         console.log('getOneUserInfo', error);

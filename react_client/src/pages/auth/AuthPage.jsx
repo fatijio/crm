@@ -49,7 +49,7 @@ export default function AuthPage() {
                 message: 'Введите ваш email',
               },
             ]}
-            initialValue="admin1@yandex.ru"
+            initialValue="admin@yandex.ru"
 
           >
             <Input />

@@ -14,6 +14,9 @@ import SiderTemplate from './pages/template/SiderTemplate';
 import FooterTemplate from './pages/template/FooterTemplate';
 import Error404 from './pages/404Page';
 import { getStatuses } from './store/slices/taskSlice';
+import { openMessageBox, closeMessageBox } from './store/slices/messageSlice';
+import GlobalMessage from './components/GlobalMessageComponent';
+import UserDetailPage from './pages/UserDetailPage';
 
 const { Content } = Layout;
 
@@ -21,6 +24,7 @@ const App = () => {
 
   const dispatch = useDispatch();
   const { isAuth, group } = useSelector(state => state.auth);
+  const { message } = useSelector(state => state.message);
   //console.log('console', isAuth, group);
 
   useEffect(() => {
@@ -62,6 +66,8 @@ const App = () => {
                   <Route path='/task/:id' element={<TaskDetailPage />} />
                   <Route path='/info' element={<InfoPage />} />
                   <Route path='/users' element={<UsersPage />} />
+                  <Route path='/users/:id' element={<UserDetailPage />} />
+                  <Route path='/users/profile' element={<UserDetailPage />} />
                   <Route path='/settings' element={<SettingsPage />} />
                   {/*<Route path='/addTask' element={<AddTask />} />
                   <Route path='/product/edit/:id' element={<EditProduct />} />
@@ -78,6 +84,7 @@ const App = () => {
           </Layout>
         </>
         : <AuthPage />}
+        {message && (<GlobalMessage type={message.type} message={message.message} detail={message.detail}/>)}
     </Layout >
   )
 }

@@ -12,7 +12,7 @@ const fs = require('fs');
 
 // create main Model
 const Task = db.tasks;
-const Status = db.status;
+const Group = db.groups;
 const Category = db.category;
 const Message = db.message;
 const User = db.users;
@@ -20,7 +20,7 @@ const File = db.files;
 //const Review = db.comments
 
 // 1. create task
-const addTask = async (req, res) => {
+const addUser = async (req, res) => {
     //console.log(req.body)
     const errors = validationResult(req);
 
@@ -38,7 +38,7 @@ const addTask = async (req, res) => {
     //console.log('acc', userAccessTokenCheck);
     //console.log('path', req.files)
     const collectionFiles = req.files;
-    //console.log('collection files', collectionFiles);
+    console.log('collection files', collectionFiles);
     //return;
 
     let taskBody = {
@@ -66,85 +66,49 @@ const addTask = async (req, res) => {
                     file.types = file.mimetype
             })
             const taskFiles = await File.bulkCreate(collectionFiles);
-            //console.log('taskFilesCreated', taskFiles);
+            console.log('taskFilesCreated', taskFiles);
         }
-        //return res.status(200).json({ task: savedTask[0].dataValues, msg: 'Задача создана' });
-        console.log('savedTask[0].dataValues', savedTask[0].dataValues);
-        const createdTask = savedTask[0].dataValues;
-        return res.status(200).send(
-            {
-              data: createdTask,
-              notify : { 
-                type: 'success',
-                message: `Задача успешно создана`,
-                detail: `Номер задачи #${createdTask.id}`
-              } 
-            }
-          );
+        //console.log('contoller/addTask', task.id);
+        //console.log('contoller/addTask', savedTask[0].dataValues);
+        return res.status(200).json({ task: savedTask[0].dataValues, msg: 'Задача создана' });
+        //return res.status(400).json({ error: { message: 'Не удалось создать задачу', errorName: error.name } });
+        //console.log(product)
     } catch (error) {
-        return res.status(503).send(
-            {
-              notify : { 
-                type: 'error',
-                message: 'Не удалось создать задачу',
-                detail: error.message,
-              } 
-            }
-          );
+        return res.status(503).json({ error: { message: 'Не удалось создать задачу', errorName: error.name } });
     }
 }
 
 // 2. get all tasks
-const getAllTasks = async (req, res) => {
+const getAllUsers = async (req, res) => {
     const userAccessToken = req.headers.authorization;
     const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1]);
     //console.log('getAllTasks', req);
     console.log('userAccessTokenCheck', userAccessTokenCheck);
-    if (req.query.statuses === 'get') {
-        console.log('зашли в statuses')
-        if (userAccessTokenCheck.group === 1) {
-            console.log('зашли в statuses групп')
-            const query = {
-                attributes: ['id', 'name'],
-                where: { published: 1 }
-            }
-            const statusesList = await Status.findAll(query);
-            return res.status(200).json(statusesList)
-        }else{
-            return res.status(401).json('Не удалось загрузить список статусов');
-        }
-    }
     try {
-        console.log('зашли в поиск задачи')
+
         let query = '';
         if (userAccessTokenCheck.group === 1) {
             query = {
-                attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
-                include: [{ model: Status, attributes: ['id', 'name', 'color'] }, { model: Category, attributes: ['id', 'name'] }],
-                order: [
-                    ['id', 'ASC']
-                ]
-            }
-        } else {
-            query = {
-                attributes: ['id', 'title', 'description', 'createdAt', ['id', 'key']],
-                where: { userId: userAccessTokenCheck.id },
-                include: [{ model: Status, attributes: ['id', 'name', 'color'] }, { model: Category, attributes: ['id', 'name'] }],
+                attributes: ['id', 'login', 'name', 'middleName', 'lastName', 'city', 'phone', 'email', 'post', 'profession', 'published', 'createdAt', 'updatedAt'],
+                include: [
+                  { model: Group, attributes: ['id', 'name'] },
+                  //{ model: Category, attributes: ['id', 'name'] }
+                ],
                 order: [
                     ['id', 'ASC']
                 ]
             }
         }
 
-        let tasks = await Task.findAll(query);
+        let users = await User.findAll(query);
 
         //console.log('tasks', tasks);
-        if (tasks.length == 0) {
+        if (users.length == 0) {
             return res.json({ empty: 'Нет данных' });
         }
-        return res.status(200).json(tasks)
+        return res.status(200).json(users)
     } catch (error) {
-        return res.status(401).json('У Вас нет доступа к задачам');
+        return res.status(401).json('У Вас нет доступа к списку пользователей');
     }
 
 }
@@ -223,13 +187,55 @@ const getCategories = async (req, res) => {
     return res.send(categories);
 }
 
-// 4. update task
-const updateTask = async (req, res) => {
+// 4. update user
+const updateUser = async (req, res) => {
     let id = req.params.id;
-    //console.log('updateTask', req.body);
-    //console.log('updateTask_params', req.params);
-    const task = await Task.update(req.body, { where: { id: id } });
-    res.status(200).send(task);
+    let error = [];
+    try{
+      //console.log('updateUser try', req);
+      console.log('update user', req.body);
+      Object.entries(req.body).forEach(row => {
+        if(row[0] === 'name' && row[1] === ''){
+          error = [...error, 'Имя'];
+        }
+        if(row[0] === 'email' && row[1] === ''){
+          error = [...error, 'Email'];
+        }
+      });
+
+      if(error.length) {
+        return res.status(400).json(
+          {
+            notify :{ 
+              type: 'error',
+              message: `Не заполнено поле ${error}`,
+              detail: error.name,
+            }
+          }
+        );
+      }
+
+      const user = await User.update(req.body, { where: { id: id } });
+      res.status(200).send(
+        {
+          data: user,
+          notify : { 
+            type: 'success',
+            message: 'Профиль обновлен', 
+          } 
+        }
+      );
+    }catch(error){
+      res.status(400).json(
+        {
+          notify :{ 
+            type: 'error',
+            message: 'Не удалось обновить профиль',
+            detail: error.name,
+          }
+        }
+      )
+    }
 }
 // 5. delete task by id
 const deleteTask = async (req, res) => {
@@ -401,14 +407,14 @@ const upload = multer({
 }).array('files', 5)
 
 module.exports = {
-    addTask,
+    addUser,
     addMessageToTask,
-    getAllTasks,
+    getAllUsers,
     getTaskDetail,
     getTaskDetailMessages,
     getCategories,
     getTaskFiles,
     deleteTask,
-    updateTask,
+    updateUser,
     upload
 }

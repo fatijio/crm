@@ -5,7 +5,28 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        fio: {
+        name: {
+            type: DataTypes.STRING
+        },
+        middleName: {
+            type: DataTypes.STRING
+        },
+        lastName: {
+            type: DataTypes.STRING
+        },
+        phone: {
+            type: DataTypes.STRING
+        },
+        city: {
+            type: DataTypes.STRING
+        },
+        birthDate: {
+            type: DataTypes.DATE
+        },
+        profession: {
+            type: DataTypes.STRING
+        },
+        post: {
             type: DataTypes.STRING
         },
         password: {

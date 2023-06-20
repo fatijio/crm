@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert, Layout, Badge, Row, Col, Dropdown, Space, Popover } from 'antd';
 import { UserOutlined, ImportOutlined, BellOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
+import {Link} from 'react-router-dom';
 import { fetchLogout } from '../../store/slices/authSlice';
 import { getNotifications, deleteNotification, setNewNotice } from '../../store/slices/notifySlice';
 
@@ -9,7 +10,7 @@ const { Header } = Layout;
 
 const HeaderTemplate = () => {
 
-  const login = useSelector(state => state.auth.login);
+  const {userId, login} = useSelector(state => state.auth);
   const notifies = useSelector(state => state.notify.messages);
   const dispatch = useDispatch();
 
@@ -42,7 +43,9 @@ const HeaderTemplate = () => {
   const items = [
     {
       key: '1',
-      label: `Вы ${login}`,
+      label: (
+        <Link to={`/users/profile`}>Вы {login}</Link>
+      ),
       icon: <UserOutlined />
     },
     {
@@ -79,7 +82,7 @@ const HeaderTemplate = () => {
               arrowPointAtCenter="true"
               mouseLeaveDelay="0.3"
               autoAdjustOverflow="false"
-              content={notifies.map(notice => {
+              content={notifies.length > 0 ? notifies.map(notice => {
                 return (
                   <Alert
                     key={notice.id}
@@ -92,7 +95,7 @@ const HeaderTemplate = () => {
                 )
 
 
-              })}
+              }) : 'Пусто'}
               trigger="hover"
             >
               <Badge className="badge_count" title="" overflowCount={99} count={notifies.length > 0 ? notifies.length : '0'}>

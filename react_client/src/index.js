@@ -16,13 +16,15 @@ const store = setupStore();
 // Settings theme
 const defaultData = {
     colorPrimary: '#1677ff',
+    colorLink: '#8596a6',
+    borderRadius: 4
 };
 // Global config notification
 notification.config({
     placement: 'bottomRight',
     bottom: 50,
-    duration: 3,
-    maxCount: 3,
+    duration: 8,
+    maxCount: 5,
 });
 
 const container = document.getElementById('root');
@@ -35,6 +37,8 @@ root.render(
                 theme={{
                     token: {
                         colorPrimary: defaultData.colorPrimary,
+                        //colorLink: defaultData.colorLink,
+                        borderRadius: defaultData.borderRadius,
                     },
                     components: {
 
