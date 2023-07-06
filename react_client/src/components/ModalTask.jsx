@@ -3,16 +3,10 @@ import { Button, Modal } from 'antd';
 import { DiffOutlined, PlusOutlined } from '@ant-design/icons';
 import AddTask from './AddTask';
 
-<<<<<<< Updated upstream
-const ModalTask = () => {
+const ModalTask = ({loading}) => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-=======
-const ModalTask = ({ loading }) => {
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-
->>>>>>> Stashed changes
+  
   const showModal = () => {
     setOpen(true);
   };
@@ -35,7 +29,7 @@ const ModalTask = ({ loading }) => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
+      <Button type="primary" onClick={showModal} disabled={loading}>
         <PlusOutlined />Создать задачу
       </Button>
       <Modal
@@ -46,11 +40,7 @@ const ModalTask = ({ loading }) => {
         onCancel={handleCancel}
         footer={null}
       >
-<<<<<<< Updated upstream
-        <AddTask openModal={handleOpenModal} />
-=======
-        <AddTask openModal={handleOpenModal} handleCancel={handleCancel} />
->>>>>>> Stashed changes
+        <AddTask openModal={handleOpenModal} handleCancel={handleCancel}/>
       </Modal >
     </>
   );

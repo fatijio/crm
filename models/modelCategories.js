@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         description: {
             type: DataTypes.TEXT
         },
-        active: {
+        published: {
             type: DataTypes.BOOLEAN
         },
     },

@@ -17,20 +17,15 @@ const store = setupStore();
 const defaultData = {
 <<<<<<< Updated upstream
     colorPrimary: '#1677ff',
-=======
-    colorPrimary: '#0ea5e9',
-    colorLink: '#0369a1',
-    borderRadius: 8,
-    fontSize: 15,
-    colorBgLayout: '#e8ebef',
->>>>>>> Stashed changes
+    colorLink: '#8596a6',
+    borderRadius: 4
 };
 // Global config notification
 notification.config({
     placement: 'bottomRight',
     bottom: 50,
-    duration: 3,
-    maxCount: 3,
+    duration: 8,
+    maxCount: 5,
 });
 
 const container = document.getElementById('root');
@@ -43,13 +38,8 @@ root.render(
                 theme={{
                     token: {
                         colorPrimary: defaultData.colorPrimary,
-<<<<<<< Updated upstream
-=======
-                        colorLink: defaultData.colorLink,
+                        //colorLink: defaultData.colorLink,
                         borderRadius: defaultData.borderRadius,
-                        fontSize: defaultData.fontSize,
-                        colorBgLayout: defaultData.colorBgLayout,
->>>>>>> Stashed changes
                     },
                     components: {
 

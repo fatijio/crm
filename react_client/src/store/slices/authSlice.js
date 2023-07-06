@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { openMessageBox } from './messageSlice';
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
 
@@ -8,14 +7,12 @@ const ACCESS_KEY = 'u-access';
 
 export const fetchLogin = createAsyncThunk(
     'auth/fetchLogin',
-    async function ([emailData, passwordData], { rejectWithValue, dispatch }) {
+    async function ([emailData, passwordData], { rejectWithValue }) {
         try {
-            const response = await axios.post('/api/auth/login', { email: emailData, password: passwordData });
+            const loginData = await axios.post('/api/auth/login', { email: emailData, password: passwordData });
             //console.log('loginData', loginData);
-            dispatch(openMessageBox(response.data.notify));
-            return response.data;
+            return loginData.data;
         } catch (error) {
-            dispatch(openMessageBox(error.response.data.notify));
             return rejectWithValue(error.response.data);
         }
     }
@@ -23,26 +20,23 @@ export const fetchLogin = createAsyncThunk(
 
 export const fetchAuth = createAsyncThunk(
     'auth/fetchAuth',
-    async function (token, { rejectWithValue, dispatch }) {
+    async function (token, { rejectWithValue }) {
         try {
             const checkAccess = await axios.get('/api/auth/access', { params: { token: token } });
-            console.log('checkAccess', checkAccess);
+            //console.log('checkAccess', checkAccess);
             if (checkAccess.data.type === 'error') {
                 const response = await axios.get('/api/auth/refresh', { withCredentials: true });
-                console.log('going to refresh', response);
-                dispatch(openMessageBox(response.data.notify));
+                //console.log('going to refresh', response);
                 if (!response) {
                     return false;
                 }
-                dispatch(openMessageBox(response.data.notify));
                 localStorage.setItem('u-access', response.data.access_token);
                 return response.data;
             }
-            console.log(checkAccess.data);
+            //console.log(checkAccess.data);
             return checkAccess.data;
         } catch (error) {
-            dispatch(openMessageBox(error.response.data.notify));
-            console.log('error.response.data', error.response.data);
+            //console.log('error.response.data', error.response.data);
             return rejectWithValue(error.response.data);
         }
 
@@ -98,9 +92,9 @@ const authSlice = createSlice({
             localStorage.setItem(ACCESS_KEY, action.payload.access_token);
         },
         [fetchLogin.rejected]: (state, action) => {
-            //state.error = action.payload;
+            state.error = action.payload;
             state.isAuth = false;
-            console.log(action.payload);
+            //console.log(action.payload);
         },
         [fetchAuth.pending]: (state) => {
             state.error = null;

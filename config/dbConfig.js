@@ -1,7 +1,7 @@
 module.exports = {
     HOST: 'localhost',
-    USER: 'mysql',
-    PASSWORD: 'mysql',
+    USER: 'root',
+    PASSWORD: 'root',
     DB: 'crm_tasks',
     dialect: 'mysql',
     pool: {

@@ -17,11 +17,13 @@ const router = require('./routes/productRouter.js');
 const routerTask = require('./routes/routerTask.js');
 const routerAuth = require('./routes/routerAuth.js');
 const routerNotification = require('./routes/routerNotification.js');
+const routerUser = require('./routes/routerUser.js');
 
 app.use('/api/products', router);
 app.use('/api/tasks', routerTask);
 app.use('/api/auth', routerAuth);
 app.use('/api/notifications', routerNotification);
+app.use('/api/users', routerUser);
 
 //static Images Folder
 //app.use('upload', express.static('upload'));

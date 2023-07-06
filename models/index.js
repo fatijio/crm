@@ -1,5 +1,6 @@
 const dbConfig = require('../config/dbConfig.js');
 const { Sequelize, DataTypes } = require('sequelize');
+
 const sequelize = new Sequelize(
     dbConfig.DB,
     dbConfig.USER,
@@ -44,13 +45,9 @@ db.groups = require('./modelGroups.js')(sequelize, DataTypes)
 db.notify = require('./modelNotify.js')(sequelize, DataTypes)
 db.files = require('./modelFiles.js')(sequelize, DataTypes)
 
-<<<<<<< Updated upstream
-//db.sequelize.sync({ force: true }).then(() => { console.log('Все модели были заново созданы.') })
-//db.sequelize.sync({ alter: true }).then(() => { console.log('Все модели были успешно обновлены.') })
-=======
 // Создание первоначальных справочников
 // db.sequelize.sync({ force: true }).then(() => {
-
+  
 //   // Статусы
 //   db.status.bulkCreate([
 //     { name: 'Обработка', color: '#bfbfbf', published: true },
@@ -87,7 +84,6 @@ db.files = require('./modelFiles.js')(sequelize, DataTypes)
 
 // Обновление текущих таблиц
 //db.sequelize.sync({ alter: true }).then(() => { console.log('Все модели были успешно обновлены.') });
->>>>>>> Stashed changes
 
 /*db.products.hasMany(db.reviews, {
     foreignKey: 'product_id',
@@ -125,6 +121,5 @@ db.message.belongsTo(db.users, { foreignKey: 'user_id' });
 
 db.tasks.hasMany(db.message, { foreignKey: 'task_id' });
 db.message.belongsTo(db.tasks, { foreignKey: 'task_id' });
-
 
 module.exports = db

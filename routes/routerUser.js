@@ -18,7 +18,7 @@ router.get('/list', controllerUser.getAllUsers);
 //     check('message').escape().trim().isLength({ min: 2 }).withMessage('Сообщение не может быть пустым')
 // ], controllerTask.addMessageToTask);
 // router.put('/:id', groupMiddleware(1), controllerTask.updateTask);
-router.put('/:id', controllerUser.updateUser);
+router.put('/:id', groupMiddleware(1), controllerUser.updateUser);
 //router.delete('/:id', controllerUser.removeUser);
 
 module.exports = router

@@ -14,12 +14,9 @@ import SiderTemplate from './pages/template/SiderTemplate';
 import FooterTemplate from './pages/template/FooterTemplate';
 import Error404 from './pages/404Page';
 import { getStatuses } from './store/slices/taskSlice';
-<<<<<<< Updated upstream
-=======
+import { openMessageBox, closeMessageBox } from './store/slices/messageSlice';
 import GlobalMessage from './components/GlobalMessageComponent';
 import UserDetailPage from './pages/UserDetailPage';
-import { openMessageBox } from './store/slices/messageSlice';
->>>>>>> Stashed changes
 
 const { Content } = Layout;
 
@@ -27,6 +24,7 @@ const App = () => {
 
   const dispatch = useDispatch();
   const { isAuth, group } = useSelector(state => state.auth);
+  const { message } = useSelector(state => state.message);
   //console.log('console', isAuth, group);
 
   useEffect(() => {
@@ -73,6 +71,8 @@ const App = () => {
                   <Route path='/task/:id' element={<TaskDetailPage />} />
                   <Route path='/info' element={<InfoPage />} />
                   <Route path='/users' element={<UsersPage />} />
+                  <Route path='/users/:id' element={<UserDetailPage />} />
+                  <Route path='/users/profile' element={<UserDetailPage />} />
                   <Route path='/settings' element={<SettingsPage />} />
                   {/*<Route path='/addTask' element={<AddTask />} />
 =======
@@ -117,10 +117,7 @@ const App = () => {
           </Layout>
         </>
         : <AuthPage />}
-<<<<<<< Updated upstream
-=======
-      {message && (<GlobalMessage type={message.type} message={message.message} detail={message.detail} />)}
->>>>>>> Stashed changes
+        {message && (<GlobalMessage type={message.type} message={message.message} detail={message.detail}/>)}
     </Layout >
   )
 }

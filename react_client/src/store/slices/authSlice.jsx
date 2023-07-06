@@ -58,7 +58,9 @@ export const fetchLogout = createAsyncThunk(
 )
 
 const initialState = {
+    userId: null,
     login: '',
+    userData: null,
     access: localStorage.getItem(ACCESS_KEY) ?? '',
     isAuth: false,
     group: 2,
@@ -78,11 +80,14 @@ const authSlice = createSlice({
     },
     extraReducers: {
         [fetchLogin.fulfilled]: (state, action) => {
-            let groupId = jwt_decode(action.payload.access_token);
-            state.login = action.payload.user;
+            let user = jwt_decode(action.payload.access_token);
+            state.userId = user.id;
+            state.login = action.payload.user.login;
+            state.userData = action.payload.user;
             state.access = action.payload.access_token;
-            state.group = groupId.group;
+            state.group = user.group;
             //console.log('action.payload', jwt_decode(action.payload.access_token));
+            console.log('action.payload', action.payload);
             state.isAuth = true;
             localStorage.setItem(ACCESS_KEY, action.payload.access_token);
         },
@@ -96,8 +101,9 @@ const authSlice = createSlice({
         },
         [fetchAuth.fulfilled]: (state, action) => {
             state.isAuth = action.payload.isAuth;
-            state.login = action.payload.user.fio;
+            state.login = action.payload.user.name;
             state.group = action.payload.user.group_id;
+            state.userData = action.payload.user;
             //state.login = action.payload.email;
             //console.log(action.payload)
         },

@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         color: {
             type: DataTypes.STRING
         },
-        active: {
+        published: {
             type: DataTypes.BOOLEAN
         },
     },

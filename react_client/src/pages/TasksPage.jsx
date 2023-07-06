@@ -5,17 +5,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import ModalTask from '../components/ModalTask';
 import { getTasks } from '../store/slices/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
-<<<<<<< Updated upstream
-import openNotification from '../components/NotificationComponent';
 
-const columns = [
+const {Text} = Typography;
+
+const getColumns = (statuses) => {
+  return [
   {
     title: 'ID',
     key: 'id',
     dataIndex: 'id',
     sorter: (a, b) => a.id - b.id,
     showSorterTooltip: false,
-    width: '5%',
+    width: '3%',
   },
   {
     title: 'Дата создания',
@@ -78,27 +79,26 @@ const getColumns = (statuses) => {
 <<<<<<< Updated upstream
   },
   {
+    title: 'Заголовок',
+    key: 'title',
+    dataIndex: 'title',
+    width: '25%',
+    ellipsis: true,
+    render: (_, title) => (
+      <Space size="middle">
+        <Link to={`/task/${title.id}`}>{title.title}</Link>
+      </Space >
+    ),
+  },
+  {
     title: 'Статус',
     dataIndex: 'status',
     key: 'status',
     width: '10%',
-    filters: [
-      {
-        text: 'Обработка',
-        value: 'Обработка',
-      },
-      {
-        text: 'В работе',
-        value: 'В работе',
-      },
-      {
-        text: 'Выполнено',
-        value: 'Выполнено',
-      },
-    ],
+    filters: statuses.map( status => {return {text: status.name, value: status.name}}),
     onFilter: (value, record) => record.status.name.indexOf(value) === 0,
     render: (status) => (
-      < Tag icon={(status.id === 2) ? < SyncOutlined spin /> : ' '} color={status.color} >
+      <Tag icon={(status.id === 2) ? < SyncOutlined spin /> : ' '} color={status.color} >
         {status.name}
       </Tag >
     ),
@@ -110,18 +110,6 @@ const getColumns = (statuses) => {
     width: '10%',
     render: (category) => (
       category.name
-    ),
-  },
-  {
-    title: 'Заголовок',
-    key: 'title',
-    dataIndex: 'title',
-    width: '25%',
-    ellipsis: true,
-    render: (_, title) => (
-      <Space size="middle">
-        <Link to={`/task/${title.id}`}>{title.title}</Link>
-      </Space >
     ),
   },
   {
@@ -142,61 +130,16 @@ const getColumns = (statuses) => {
       ),
   },*/
 ];
-=======
-    {
-      title: 'Статус',
-      dataIndex: 'status',
-      key: 'status',
-      width: '10%',
-      filters: statuses.map(status => { return { text: status.name, value: status.name } }),
-      onFilter: (value, record) => record.status.name.indexOf(value) === 0,
-      render: (status) => (
-        <Tag icon={(status.id === 2) ? < SyncOutlined spin /> : ' '} color={status.color} >
-          {status.name}
-        </Tag >
-      ),
-    },
-    {
-      title: 'Категория',
-      dataIndex: 'category',
-      key: 'category.id',
-      width: '10%',
-      render: (category) => (
-        category.name
-      ),
-    },
-    {
-      title: 'Описание',
-      dataIndex: 'description',
-      key: 'description',
-      width: '60%',
-      ellipsis: true,
-      //render: (text) => ({ text }),
-    },
-    /*{
-        title: 'Действия',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                <Link to={`/task/edit/${record.id}`}>Редактировать</Link>
-            </Space >
-        ),
-    },*/
-  ];
 }
->>>>>>> Stashed changes
 
 const TaskList = () => {
   //const [tasks, setTasks] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, tasks, error } = useSelector(state => state.task);
+  const { loading, tasks, statuses } = useSelector(state => state.task);
+
   useEffect(() => {
-    if (error) {
-      openNotification('error', error.message);
-    } else {
-      dispatch(getTasks());
-    }
+    dispatch(getTasks());
   }, []);
 
   return (
@@ -204,23 +147,14 @@ const TaskList = () => {
       <Row justify="space-between">
         <Col lg={16}><Typography.Title level={3}>Задачи</Typography.Title></Col>
         <Col>
-<<<<<<< Updated upstream
-          <ModalTask />
-=======
-          <ModalTask loading={loading} />
->>>>>>> Stashed changes
+          <ModalTask loading={loading}/>
         </Col>
       </Row>
       <Row>
         <Col lg={24}>
           <Table
             locale="ru"
-<<<<<<< Updated upstream
-            columns={columns}
-=======
-            bordered
             columns={getColumns(statuses)}
->>>>>>> Stashed changes
             dataSource={tasks.empty ? [] : tasks}
             loading={loading}
             size="large"
@@ -232,9 +166,21 @@ const TaskList = () => {
             pagination={{
               position: ['bottomLeft'],
             }}
+            summary={(tasks) => {
+              return (
+                <>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} colSpan={24}>
+                      Кол-во задач: <Text type="dafault">{tasks.length ? tasks.length : 0}</Text>
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                </>
+              );
+            }}
           />
         </Col>
       </Row>
+      {/*notify && (<OpenNotification type={notify.type} message={notify.message} detail={notify.detail}/>)*/}
     </>
   )
 }

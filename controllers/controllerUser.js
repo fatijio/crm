@@ -91,8 +91,8 @@ const getAllUsers = async (req, res) => {
             query = {
                 attributes: ['id', 'login', 'name', 'middleName', 'lastName', 'city', 'phone', 'email', 'post', 'profession', 'published', 'createdAt', 'updatedAt'],
                 include: [
-                    { model: Group, attributes: ['id', 'name'] },
-                    //{ model: Category, attributes: ['id', 'name'] }
+                  { model: Group, attributes: ['id', 'name'] },
+                  //{ model: Category, attributes: ['id', 'name'] }
                 ],
                 order: [
                     ['id', 'ASC']
@@ -191,51 +191,50 @@ const getCategories = async (req, res) => {
 const updateUser = async (req, res) => {
     let id = req.params.id;
     let error = [];
-    try {
-        //console.log('updateUser try', req);
-        console.log('update user', req.body);
-        Object.entries(req.body).forEach(row => {
-            if (row[0] === 'name' && row[1] === '') {
-                error = [...error, 'Имя'];
-            }
-            if (row[0] === 'email' && row[1] === '') {
-                error = [...error, 'Email'];
-            }
-        });
-
-        if (error.length) {
-            return res.status(400).json(
-                {
-                    notify: {
-                        type: 'error',
-                        message: `Не заполнено поле ${error}`,
-                        detail: error.name,
-                    }
-                }
-            );
+    try{
+      //console.log('updateUser try', req);
+      console.log('update user', req.body);
+      Object.entries(req.body).forEach(row => {
+        if(row[0] === 'name' && row[1] === ''){
+          error = [...error, 'Имя'];
         }
+        if(row[0] === 'email' && row[1] === ''){
+          error = [...error, 'Email'];
+        }
+      });
 
-        const user = await User.update(req.body, { where: { id: id } });
-        console.log('updat user => ', user);
-        res.status(200).send(
-            {
-                data: user,
-                notify: {
-                    type: 'success',
-                    message: 'Профиль обновлен',
-                }
+      if(error.length) {
+        return res.status(400).json(
+          {
+            notify :{ 
+              type: 'error',
+              message: `Не заполнено поле ${error}`,
+              detail: error.name,
             }
+          }
         );
-    } catch (error) {
-        res.status(400).json(
-            {
-                notify: {
-                    type: 'error',
-                    message: 'Не удалось обновить профиль',
-                    detail: error.name,
-                }
-            }
-        )
+      }
+
+      const user = await User.update(req.body, { where: { id: id } });
+      res.status(200).send(
+        {
+          data: user,
+          notify : { 
+            type: 'success',
+            message: 'Профиль обновлен', 
+          } 
+        }
+      );
+    }catch(error){
+      res.status(400).json(
+        {
+          notify :{ 
+            type: 'error',
+            message: 'Не удалось обновить профиль',
+            detail: error.name,
+          }
+        }
+      )
     }
 }
 // 5. delete task by id
