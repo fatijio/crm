@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Form, Input, Divider, Upload, Select } from 'antd';
+import { Button, Form, Input, Divider, Upload, Select, Space } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { addTask } from '../store/slices/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import openNotification from './NotificationComponent';
 import axios from 'axios';
 
-const AddTask = ({ openModal }) => {
+const AddTask = ({ openModal, handleCancel }) => {
 
+  const dispatch = useDispatch();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState();
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState(1);
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
+  
   const { loading } = useSelector(state => state.task);
   const { TextArea } = Input;
   const { Option } = Select;
-
+  
   useEffect(() => {
     const getCategories = async () => {
       const { data } = await axios.get('/api/tasks/categories', { headers: { Authorization: `Bearer ${localStorage.getItem('u-access')}` } });
@@ -41,26 +41,6 @@ const AddTask = ({ openModal }) => {
     return e?.fileList;
   };
 
-  // const openNotificationWithIcon = (type, message) => {
-  //   if (Array.isArray(message)) {
-  //     for (let i = 0; i < message.length; i++) {
-  //       notification[type]({
-  //         message: message[i],
-  //         placement: 'bottomRight',
-  //         maxCount: 5,
-  //         //description: errorname,
-  //       });
-  //     }
-  //   } else {
-  //     notification[type]({
-  //       message: message,
-  //       placement: 'bottomRight',
-  //       maxCount: 5,
-  //       //description: errorname,
-  //     });
-  //   }
-  // };
-
   const handleUpload = (files) => {
     //console.log('fileList', files);
     setFiles(files);
@@ -82,14 +62,12 @@ const AddTask = ({ openModal }) => {
       }
     }
 
-    //formData.append('files', files.fileList)
-    //console.log(formData);
     const setTask = await dispatch(addTask(formData));
-    //console.log('addhandler', setTask)
+    
     if (setTask.error) {
-      openNotification('error', setTask.payload);
+      //OpenNotification({...setTask.payload.notify});
     } else {
-      openNotification('success', setTask.payload.msg);
+      //OpenNotification({...setTask.payload.notify});
       setTitle('');
       setDescription('');
       setFiles('');
@@ -178,9 +156,14 @@ const AddTask = ({ openModal }) => {
 
         <Form.Item>
           <Divider />
-          <Button type="primary" htmlType="submit" size="large" loading={loading}>
-            Создать
-          </Button>
+          <Space wrap>
+            <Button type="primary" htmlType="submit" size="large" loading={loading}>
+              Создать
+            </Button>
+            <Button type="default" size="large" loading={loading} onClick={handleCancel}>
+              Отмена
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
     </>

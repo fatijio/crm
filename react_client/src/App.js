@@ -14,12 +14,9 @@ import SiderTemplate from './pages/template/SiderTemplate';
 import FooterTemplate from './pages/template/FooterTemplate';
 import Error404 from './pages/404Page';
 import { getStatuses } from './store/slices/taskSlice';
-<<<<<<< Updated upstream
-=======
 import GlobalMessage from './components/GlobalMessageComponent';
 import UserDetailPage from './pages/UserDetailPage';
 import { openMessageBox } from './store/slices/messageSlice';
->>>>>>> Stashed changes
 
 const { Content } = Layout;
 
@@ -27,6 +24,7 @@ const App = () => {
 
   const dispatch = useDispatch();
   const { isAuth, group } = useSelector(state => state.auth);
+  const { message } = useSelector(state => state.message);
   //console.log('console', isAuth, group);
 
   useEffect(() => {
@@ -53,29 +51,6 @@ const App = () => {
             <Layout>
               <SiderTemplate group={group} />
 
-<<<<<<< Updated upstream
-            <Content
-              style={{
-                margin: '24px 16px 0',
-              }}
-              className="content_block"
-            >
-              <div
-                className="site-layout-background"
-                style={{
-                  padding: 24,
-                  minHeight: 360,
-                }}
-              >
-                <Routes>
-                  <Route path='*' element={< Error404 />} />
-                  <Route path='/' element={<TaskList />} />
-                  <Route path='/task/:id' element={<TaskDetailPage />} />
-                  <Route path='/info' element={<InfoPage />} />
-                  <Route path='/users' element={<UsersPage />} />
-                  <Route path='/settings' element={<SettingsPage />} />
-                  {/*<Route path='/addTask' element={<AddTask />} />
-=======
               <Layout>
                 <Content
                   style={{
@@ -100,7 +75,6 @@ const App = () => {
                       <Route path='/users/profile' element={<UserDetailPage />} />
                       <Route path='/settings' element={<SettingsPage />} />
                       {/*<Route path='/addTask' element={<AddTask />} />
->>>>>>> Stashed changes
                   <Route path='/product/edit/:id' element={<EditProduct />} />
                   <Route path='/task/edit/:id' element={<EditTask />} />*/}
 
@@ -117,10 +91,7 @@ const App = () => {
           </Layout>
         </>
         : <AuthPage />}
-<<<<<<< Updated upstream
-=======
       {message && (<GlobalMessage type={message.type} message={message.message} detail={message.detail} />)}
->>>>>>> Stashed changes
     </Layout >
   )
 }

@@ -1,12 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { openMessageBox } from './messageSlice';
 import axios from 'axios';
 
 const initialState = {
     loading: false,
-    notify: null,
+    error: '',
+    errorName: null,
     users: []
 }
+
+// export const getTaskDetail = createAsyncThunk(
+//     'task/getTaskDetail',
+//     async function (data, { rejectWithValue }) {
+
+//     }
+// )
 
 export const getUsers = createAsyncThunk(
     'user/getUsers',
@@ -25,27 +32,27 @@ export const getUsers = createAsyncThunk(
     }
 );
 
-export const queryUpdateUser = createAsyncThunk(
-    'task/queryUpdateUser',
-    async function ({id, newFormData}, { rejectWithValue, dispatch }) {
-        try {
-            const response = await axios.put(`/api/users/${id}`, newFormData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('u-access')}`,
-                }
-            });
-            //response.data.task.key = response.data.task.id;
-            //console.log(response.data);
-            dispatch(openMessageBox(response.data.notify));
-            return response.data;
-        } catch (err) {
-            //console.log(err.response.data)
-            dispatch(openMessageBox(err.response.data.notify));
-            return rejectWithValue(err.response.data);
-        }
-    }
+// export const addTask = createAsyncThunk(
+//     'task/addTask',
+//     async function (data, { rejectWithValue }) {
 
-);
+//         try {
+//             const response = await axios.post('/api/tasks/addTask', data, {
+//                 headers: {
+//                     Authorization: `Bearer ${localStorage.getItem('u-access')}`,
+//                 }
+//             });
+//             response.data.task.key = response.data.task.id;
+//             //console.log(response.data)
+
+//             return response.data;
+//         } catch (err) {
+//             //console.log(err.response.data)
+//             return rejectWithValue(err.response.data);
+//         }
+//     }
+
+// );
 
 export const userSlice = createSlice({
     name: 'user',
@@ -56,7 +63,6 @@ export const userSlice = createSlice({
         }
     },
     extraReducers: {
-        // getUsers
         [getUsers.pending]: (state, action) => {
             state.loading = true;
             //state.error = '';
@@ -70,18 +76,6 @@ export const userSlice = createSlice({
             state.error = action.payload;
             state.loading = false;
             //state.tasks = [];
-        },
-        // queryUpdateUser
-        [queryUpdateUser.pending]: (state, action) => {
-            state.loading = true;
-        },
-        [queryUpdateUser.fulfilled]: (state, action) => {
-            //state.notify = action.payload.notify;
-            state.loading = false;
-        },
-        [queryUpdateUser.rejected]: (state, action) => {
-            //state.notify = action.payload.notify;
-            state.loading = false;
         },
     }
 });

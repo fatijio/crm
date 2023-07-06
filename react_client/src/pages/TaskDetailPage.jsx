@@ -1,18 +1,13 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router'
 import { Descriptions, Divider, Input, Form, Button, Avatar, Tooltip, Upload, Space, Select } from 'antd';
 import { Comment } from '@ant-design/compatible';
 import { PageHeader } from '@ant-design/pro-layout';
-<<<<<<< Updated upstream
-import { UploadOutlined, MessageOutlined, FileOutlined } from '@ant-design/icons';
-import * as moment from 'moment';
-=======
 import { UploadOutlined, MessageOutlined, FileOutlined, LeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
->>>>>>> Stashed changes
 import 'moment/locale/ru';
-import openNotification from '../components/NotificationComponent';
+import { openMessageBox } from '../store/slices/messageSlice';
 import axios from 'axios'
 
 const { TextArea } = Input;
@@ -45,6 +40,7 @@ const TaskDetail = () => {
   const group = useSelector(state => state.auth.userData.group_id);
   const statuses = useSelector(state => state.task.statuses);
   const chatBlock = useRef();
+  const dispatch = useDispatch();
 
   //const history = useNavigate()
   //console.log(id);
@@ -101,13 +97,10 @@ const TaskDetail = () => {
       message: message,
       taskId: id
     }
-<<<<<<< Updated upstream
-=======
     if (message.trim() === '') {
       dispatch(openMessageBox({ type: 'error', message: 'Сообщение не может быть пустым' }));
       return;
     }
->>>>>>> Stashed changes
     setSendStatus(true);
     await axios.post(`/api/tasks/${id}`, messageData, {
       headers: {
@@ -123,7 +116,7 @@ const TaskDetail = () => {
         setSendStatus(false);
       })
       .catch((error) => {
-        openNotification('error', error.response.data);
+        //openNotification('error', error.response.data);
         setSendStatus(false);
       });
   }
@@ -195,26 +188,24 @@ const TaskDetail = () => {
           <Descriptions size="small" column={1} bordered>
             <Descriptions.Item label="Дата создания">{moment(created).local().format('DD.MM.YYYY HH:mm')}</Descriptions.Item>
             <Descriptions.Item label="Статус">
-<<<<<<< Updated upstream
-=======
               {console.log('currentStatus', currentStatus)}
->>>>>>> Stashed changes
-              {group === 1 ?
-                <Select
-                  value={currentStatus.id}
-                  onChange={handleChangeStatus}
+              {
+                group === 1 ?
+                  <Select
+                    value={currentStatus.id}
+                    onChange={handleChangeStatus}
 
-                >
-                  {statuses.map(status =>
-                    <Option key={status.id} value={status.id}>{status.name}</Option>
-                  )}
+                  >
+                    {statuses.map(status =>
+                      <Option key={status.id} value={status.id}>{status.name}</Option>
+                    )}
 
-                </Select>
+                  </Select>
 
-                :
-                currentStatus.name
+                  :
+                  currentStatus.name
               }
-            </Descriptions.Item>
+            </Descriptions.Item >
             <Descriptions.Item label="Категория">{category}</Descriptions.Item>
             <Descriptions.Item label="Описание">
               {description}
@@ -231,11 +222,11 @@ const TaskDetail = () => {
                 )
               })}
             </Descriptions.Item>
-          </Descriptions>
+          </Descriptions >
           <Divider orientation="left" plain><MessageOutlined /> Сообщения</Divider>
-        </PageHeader>
+        </PageHeader >
 
-      </div>
+      </div >
 
       <div className="task_detail_message_block">
         <div className="messages_block" ref={chatBlock}>
@@ -248,13 +239,8 @@ const TaskDetail = () => {
               return (
                 <div key={data.createdAt + data.id}>
                   < Comment
-<<<<<<< Updated upstream
-                    author={data.user.fio}
-                    avatar={<Avatar alt={data.user.fio} style={{ backgroundColor: color }} >{data.user.fio.substr(0, 1)}</Avatar>}
-=======
                     author={data.user.name}
                     avatar={<Avatar alt={data.user.name} style={{ backgroundColor: color }} >{data.user.name.slice(0, 1)}</Avatar>}
->>>>>>> Stashed changes
                     className="message_block_single"
                     content={
                       <p>

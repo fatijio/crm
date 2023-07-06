@@ -38,7 +38,7 @@ const addTask = async (req, res) => {
     //console.log('acc', userAccessTokenCheck);
     //console.log('path', req.files)
     const collectionFiles = req.files;
-    console.log('collection files', collectionFiles);
+    //console.log('collection files', collectionFiles);
     //return;
 
     let taskBody = {
@@ -66,15 +66,31 @@ const addTask = async (req, res) => {
                     file.types = file.mimetype
             })
             const taskFiles = await File.bulkCreate(collectionFiles);
-            console.log('taskFilesCreated', taskFiles);
+            //console.log('taskFilesCreated', taskFiles);
         }
-        //console.log('contoller/addTask', task.id);
-        //console.log('contoller/addTask', savedTask[0].dataValues);
-        return res.status(200).json({ task: savedTask[0].dataValues, msg: 'Задача создана' });
-        //return res.status(400).json({ error: { message: 'Не удалось создать задачу', errorName: error.name } });
-        //console.log(product)
+        //return res.status(200).json({ task: savedTask[0].dataValues, msg: 'Задача создана' });
+        console.log('savedTask[0].dataValues', savedTask[0].dataValues);
+        const createdTask = savedTask[0].dataValues;
+        return res.status(200).send(
+            {
+              data: createdTask,
+              notify : { 
+                type: 'success',
+                message: `Задача успешно создана`,
+                detail: `Номер задачи #${createdTask.id}`
+              } 
+            }
+          );
     } catch (error) {
-        return res.status(503).json({ error: { message: 'Не удалось создать задачу', errorName: error.name } });
+        return res.status(503).send(
+            {
+              notify : { 
+                type: 'error',
+                message: 'Не удалось создать задачу',
+                detail: error.message,
+              } 
+            }
+          );
     }
 }
 
@@ -83,17 +99,23 @@ const getAllTasks = async (req, res) => {
     const userAccessToken = req.headers.authorization;
     const userAccessTokenCheck = validateAccessToken(userAccessToken.split(' ')[1]);
     //console.log('getAllTasks', req);
+    console.log('userAccessTokenCheck', userAccessTokenCheck);
     if (req.query.statuses === 'get') {
+        console.log('зашли в statuses')
         if (userAccessTokenCheck.group === 1) {
+            console.log('зашли в statuses групп')
             const query = {
                 attributes: ['id', 'name'],
-                where: { active: 1 }
+                where: { published: 1 }
             }
             const statusesList = await Status.findAll(query);
             return res.status(200).json(statusesList)
+        }else{
+            return res.status(401).json('Не удалось загрузить список статусов');
         }
     }
     try {
+        console.log('зашли в поиск задачи')
         let query = '';
         if (userAccessTokenCheck.group === 1) {
             query = {
@@ -176,7 +198,7 @@ const getTaskDetail = async (req, res) => {
         const taskMessages = await Message.findAll({
             attributes: ['id', 'message', 'createdAt'],
             where: { task_id: taskId, published: 1 },
-            include: [{ model: User, attributes: ['fio', 'group_id'] }],
+            include: [{ model: User, attributes: ['name', 'group_id'] }],
             order: [
                 // We start the order array with the model we want to sort
                 ['id', 'ASC']
@@ -293,7 +315,7 @@ const addMessageToTask = async (req, res) => {
             task_id: createMessage.dataValues.task_id,
             published: 1
         },
-        include: [{ model: User, attributes: ['fio', 'group_id'] }]
+        include: [{ model: User, attributes: ['name', 'group_id'] }]
 
     });
 
