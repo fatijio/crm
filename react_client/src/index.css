@@ -1,5 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .logo {
-    padding: 10px 20px;
+    padding: 0 20px;
+}
+
+.logo img {
+    max-width: 200px;
 }
 
 @media(max-width: 1040px) {
@@ -31,8 +39,8 @@
 }
 
 .content_block {
-    box-shadow: 0 20px 27px rgba(0, 0, 0, .05);
-    -webkit-box-shadow: 0 20px 27px rgba(0, 0, 0, .05);
+    /* box-shadow: 0 20px 27px rgba(0, 0, 0, .05);
+    -webkit-box-shadow: 0 20px 27px rgba(0, 0, 0, .05); */
 }
 
 .task_detail_message_block {

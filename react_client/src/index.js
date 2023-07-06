@@ -15,7 +15,15 @@ const store = setupStore();
 
 // Settings theme
 const defaultData = {
+<<<<<<< Updated upstream
     colorPrimary: '#1677ff',
+=======
+    colorPrimary: '#0ea5e9',
+    colorLink: '#0369a1',
+    borderRadius: 8,
+    fontSize: 15,
+    colorBgLayout: '#e8ebef',
+>>>>>>> Stashed changes
 };
 // Global config notification
 notification.config({
@@ -35,6 +43,13 @@ root.render(
                 theme={{
                     token: {
                         colorPrimary: defaultData.colorPrimary,
+<<<<<<< Updated upstream
+=======
+                        colorLink: defaultData.colorLink,
+                        borderRadius: defaultData.borderRadius,
+                        fontSize: defaultData.fontSize,
+                        colorBgLayout: defaultData.colorBgLayout,
+>>>>>>> Stashed changes
                     },
                     components: {
 

@@ -1,7 +1,12 @@
 import React, { useEffect } from 'react';
+import logo from './../../../src/crm_logo.png';
 import { Alert, Layout, Badge, Row, Col, Dropdown, Space, Popover } from 'antd';
 import { UserOutlined, ImportOutlined, BellOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
+<<<<<<< Updated upstream
+=======
+import { Link } from 'react-router-dom';
+>>>>>>> Stashed changes
 import { fetchLogout } from '../../store/slices/authSlice';
 import { getNotifications, deleteNotification, setNewNotice } from '../../store/slices/notifySlice';
 
@@ -9,7 +14,11 @@ const { Header } = Layout;
 
 const HeaderTemplate = () => {
 
+<<<<<<< Updated upstream
   const login = useSelector(state => state.auth.login);
+=======
+  const { userId, login } = useSelector(state => state.auth);
+>>>>>>> Stashed changes
   const notifies = useSelector(state => state.notify.messages);
   const dispatch = useDispatch();
 
@@ -68,10 +77,13 @@ const HeaderTemplate = () => {
     <Header
       className="site-layout-sub-header-background"
       style={{
+        borderBottom: '1px solid #e1e3e6',
         padding: 0,
       }}
     >
-      <Row justify="end">
+      <Row justify="space-between">
+
+        <div className="logo"><img src={logo} alt="crm task logo" /></div>
         <Col span={2} xs={10} sm={4} md={2} lg={2} xl={2}>
           <Space align="center" size="large">
             <Popover
@@ -121,6 +133,7 @@ const HeaderTemplate = () => {
 
           </Space>
         </Col>
+
       </Row>
     </Header>
   )

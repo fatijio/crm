@@ -19,7 +19,15 @@ module.exports = function (req, res, next) {
         //console.log(userData)
         if (!userData) {
             //console.log('что то не так с токеном');
-            return res.status(401).json({ type: 'error', message: 'Время сессии закончено, обновите страницу F5' });
+            return res.status(401).json(
+                {
+                    notify: {
+                        type: 'error',
+                        message: 'Время сессии закончено, обновите страницу F5',
+                        detail: '',
+                    }
+                }
+            );
         }
 
         next();

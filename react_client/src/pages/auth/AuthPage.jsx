@@ -10,8 +10,8 @@ export default function AuthPage() {
       await dispatch(fetchLogin([email, password]));
   }*/
 
-  const onFinish = async (event) => {
-    const result = await dispatch(fetchLogin([event.email, event.password]));
+  const onFinish = (event) => {
+    const result = dispatch(fetchLogin([event.email, event.password]));
     if (result.error) {
       openNotification('error', result.payload);
     }
