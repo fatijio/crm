@@ -4,8 +4,13 @@ import { useParams } from 'react-router'
 import { Descriptions, Divider, Input, Form, Button, Avatar, Tooltip, Upload, Space, Select } from 'antd';
 import { Comment } from '@ant-design/compatible';
 import { PageHeader } from '@ant-design/pro-layout';
+<<<<<<< Updated upstream
 import { UploadOutlined, MessageOutlined, FileOutlined } from '@ant-design/icons';
 import * as moment from 'moment';
+=======
+import { UploadOutlined, MessageOutlined, FileOutlined, LeftOutlined } from '@ant-design/icons';
+import moment from 'moment';
+>>>>>>> Stashed changes
 import 'moment/locale/ru';
 import openNotification from '../components/NotificationComponent';
 import axios from 'axios'
@@ -36,8 +41,8 @@ const Editor = ({ onChange, onSubmit, submitting, value, getMessages }) => (
 const TaskDetail = () => {
 
   const { id } = useParams();
-  const userName = useSelector(state => state.auth.login).substr(0, 1);
-  const group = useSelector(state => state.auth.group);
+  const userName = useSelector(state => state.auth.userData.name).substr(0, 1);
+  const group = useSelector(state => state.auth.userData.group_id);
   const statuses = useSelector(state => state.task.statuses);
   const chatBlock = useRef();
 
@@ -96,6 +101,13 @@ const TaskDetail = () => {
       message: message,
       taskId: id
     }
+<<<<<<< Updated upstream
+=======
+    if (message.trim() === '') {
+      dispatch(openMessageBox({ type: 'error', message: 'Сообщение не может быть пустым' }));
+      return;
+    }
+>>>>>>> Stashed changes
     setSendStatus(true);
     await axios.post(`/api/tasks/${id}`, messageData, {
       headers: {
@@ -176,12 +188,17 @@ const TaskDetail = () => {
       <div className="site-page-header-ghost-wrapper">
         <PageHeader
           ghost={false}
+          backIcon={<Button><LeftOutlined /></Button>}
           onBack={() => window.history.back()}
           title={title}
         >
           <Descriptions size="small" column={1} bordered>
             <Descriptions.Item label="Дата создания">{moment(created).local().format('DD.MM.YYYY HH:mm')}</Descriptions.Item>
             <Descriptions.Item label="Статус">
+<<<<<<< Updated upstream
+=======
+              {console.log('currentStatus', currentStatus)}
+>>>>>>> Stashed changes
               {group === 1 ?
                 <Select
                   value={currentStatus.id}
@@ -231,8 +248,13 @@ const TaskDetail = () => {
               return (
                 <div key={data.createdAt + data.id}>
                   < Comment
+<<<<<<< Updated upstream
                     author={data.user.fio}
                     avatar={<Avatar alt={data.user.fio} style={{ backgroundColor: color }} >{data.user.fio.substr(0, 1)}</Avatar>}
+=======
+                    author={data.user.name}
+                    avatar={<Avatar alt={data.user.name} style={{ backgroundColor: color }} >{data.user.name.slice(0, 1)}</Avatar>}
+>>>>>>> Stashed changes
                     className="message_block_single"
                     content={
                       <p>

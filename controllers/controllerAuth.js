@@ -44,18 +44,40 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+<<<<<<< Updated upstream
         const user = await User.findOne({ where: { email: email } });
+=======
+        const user = await User.findOne({
+            where: { email: email },
+        });
+>>>>>>> Stashed changes
         //console.log('user_data', user);
         //console.log('user_group', user.group.name);
 
         if (!user) {
-            return res.status(404).send('Пользователь не найден');
+            return res.status(400).json(
+                {
+                    notify: {
+                        type: 'error',
+                        message: 'Пользователь не найден',
+                        detail: '',
+                    }
+                }
+            )
         }
 
         const comparePasswords = await bcrypt.compare(password, user.password);
 
         if (!comparePasswords) {
-            return res.status(404).send('Неверный пароль');
+            return res.status(400).json(
+                {
+                    notify: {
+                        type: 'error',
+                        message: 'Неверный логин или пароль',
+                        detail: '',
+                    }
+                }
+            )
         }
 
         const tokens = await generateTokens({ userId: user.id, userGroup: user.group_id });
@@ -67,8 +89,16 @@ const loginUser = async (req, res) => {
             user: user.fio,
         })
 
-    } catch (e) {
-        return res.status(401).json('Не удалось авторизоваться, повторите попытку позже');
+    } catch (error) {
+        return res.status(400).json(
+            {
+                notify: {
+                    type: 'error',
+                    message: 'Не удалось авторизоваться, повторите попытку позже',
+                    detail: error.name,
+                }
+            }
+        )
     }
 }
 
@@ -101,7 +131,15 @@ const refreshToken = async (req, res) => {
     //console.log('tokenFromDatabase------------------', tokenFromDatabase);
 
     if (!userData) {
-        return res.status(404).send('Нет такого рефреша, надо войти заново');
+        return res.status(404).send(
+            {
+                notify: {
+                    type: 'error',
+                    message: 'Авторизуйтесь заново',
+                    detail: '',
+                }
+            }
+        );
     }
     const tokens = await generateTokens({ userId: userData.id, userGroup: user.group_id });
     res.cookie('refreshToken', tokens.refresh_token, { maxAge: 51 * 60 * 60 * 1000, httpOnly: true });
@@ -116,7 +154,15 @@ const accessExpire = async (req, res) => {
     const response = validateAccessToken(query.token);
     //console.log('response', response);
     if (response === false) {
-        return res.json({ type: 'error', message: 'Необходимо заново авторизоваться' });
+        return res.json(
+            {
+                notify: {
+                    type: 'error',
+                    message: 'Необходимо заново авторизоваться',
+                    detail: '',
+                }
+            }
+        )
     }
     const userInfo = await getOneUserInfo(response.id);
     //console.log('userInfo', userInfo);
