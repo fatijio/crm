@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import ModalTask from '../components/ModalTask';
 import { getTasks } from '../store/slices/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
+import 'moment/locale/ru';
 
 const { Text } = Typography;
 
@@ -16,19 +18,19 @@ const getColumns = (statuses) => {
       dataIndex: 'id',
       sorter: (a, b) => a.id - b.id,
       showSorterTooltip: false,
-      width: '3%',
+      width: '4%',
     },
     {
       title: 'Дата создания',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: '12%',
+      width: '14%',
       //sorter: (a, b) => new Date(a.createdAt).toLocaleString() - new Date(b.createdAt).toLocaleString(),
       render: (_, data) => {
         const locaData = new Date(data.createdAt).toLocaleString();
         return (
           <>
-            {locaData}
+            {moment(data.createdAt).local().format('DD.MM.YYYY HH:mm')}
           </>
         )
 
@@ -110,10 +112,11 @@ const TaskList = () => {
         <Col lg={24}>
           <Table
             locale="ru"
+            bordered
             columns={getColumns(statuses)}
             dataSource={tasks.empty ? [] : tasks}
             loading={loading}
-            size="middle"
+            size="large"
             onRow={(record, rowIndex) => {
               return {
                 onDoubleClick: event => { navigate(`/task/${record.id}`) },
