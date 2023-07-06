@@ -31,24 +31,15 @@ const SiderTemplate = ({ group }) => {
     return (
 
         <Sider
-            //collapsible
+            theme="light"
+            collapsible
             collapsed={collapsed}
             onCollapse={(value) => setCollapsed(value)}
             breakpoint="lg"
+
             onBreakpoint={broken => {
                 //console.log(broken);
             }}
-            style={{backgroundColor: '#4f5860'}}
-        >
-            <div className="logo" style={{ minHeight: '80px' }}><img src={logo} alt="crm task logo" /> </div>
-            <Menu
-                theme="dark"
-                mode="inline"
-                items={checkGroups()}
-                style={{backgroundColor: '#4f5860'}}
-            >
-            </Menu>
-=======
             trigger={collapsed ? <RightOutlined /> : <><LeftOutlined /> Свернуть</>}
             width={240}
         >
@@ -61,7 +52,6 @@ const SiderTemplate = ({ group }) => {
                 >
                 </Menu>
             </Layout>
->>>>>>> Stashed changes
         </Sider>
 
     )

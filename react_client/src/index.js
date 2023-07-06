@@ -15,7 +15,6 @@ const store = setupStore();
 
 // Settings theme
 const defaultData = {
-<<<<<<< Updated upstream
     colorPrimary: '#1677ff',
     colorLink: '#8596a6',
     borderRadius: 4

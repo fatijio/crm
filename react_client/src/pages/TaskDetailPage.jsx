@@ -4,8 +4,7 @@ import { useParams } from 'react-router'
 import { Descriptions, Divider, Input, Form, Button, Avatar, Tooltip, Upload, Space, Select } from 'antd';
 import { Comment } from '@ant-design/compatible';
 import { PageHeader } from '@ant-design/pro-layout';
-<<<<<<< Updated upstream
-import { UploadOutlined, MessageOutlined, FileOutlined } from '@ant-design/icons';
+import { UploadOutlined, MessageOutlined, FileOutlined, LeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/ru';
 import { openMessageBox } from '../store/slices/messageSlice';
@@ -98,8 +97,8 @@ const TaskDetail = () => {
       message: message,
       taskId: id
     }
-    if(message.trim() === '') {
-      dispatch(openMessageBox({type: 'error', message: 'Сообщение не может быть пустым'}));
+    if (message.trim() === '') {
+      dispatch(openMessageBox({ type: 'error', message: 'Сообщение не может быть пустым' }));
       return;
     }
     setSendStatus(true);
@@ -117,14 +116,13 @@ const TaskDetail = () => {
         setSendStatus(false);
       })
       .catch((error) => {
-        //OpenNotification('error', error.response.data);
+        //openNotification('error', error.response.data);
         setSendStatus(false);
       });
   }
 
   //console.log('Statuses', statuses);
   const handleChangeStatus = async (statusId) => {
-    console.log('handleChangeStatus', statusId);
     const data = {
       id: id,
       status_id: statusId
@@ -136,8 +134,6 @@ const TaskDetail = () => {
           Authorization: `Bearer ${localStorage.getItem('u-access')}`,
         }
       });
-
-    console.log('updateStatus', updateStatus);
 
     if (updateStatus.data[0] === 1) {
       let newStatus = statuses.filter(item => item.id === statusId);
@@ -192,22 +188,24 @@ const TaskDetail = () => {
           <Descriptions size="small" column={1} bordered>
             <Descriptions.Item label="Дата создания">{moment(created).local().format('DD.MM.YYYY HH:mm')}</Descriptions.Item>
             <Descriptions.Item label="Статус">
-              {console.log('currentStatus',currentStatus)}
-              {group === 1 ?
-                <Select
-                  value={currentStatus.id}
-                  onChange={handleChangeStatus}
+              {console.log('currentStatus', currentStatus)}
+              {
+                group === 1 ?
+                  <Select
+                    value={currentStatus.id}
+                    onChange={handleChangeStatus}
 
-                >
-                  {statuses.map(status =>
-                    <Option key={status.id} value={status.id}>{status.name}</Option>
-                  )}
+                  >
+                    {statuses.map(status =>
+                      <Option key={status.id} value={status.id}>{status.name}</Option>
+                    )}
 
-                </Select>
-                :
-                currentStatus.name
+                  </Select>
+
+                  :
+                  currentStatus.name
               }
-            </Descriptions.Item>
+            </Descriptions.Item >
             <Descriptions.Item label="Категория">{category}</Descriptions.Item>
             <Descriptions.Item label="Описание">
               {description}
@@ -224,11 +222,11 @@ const TaskDetail = () => {
                 )
               })}
             </Descriptions.Item>
-          </Descriptions>
+          </Descriptions >
           <Divider orientation="left" plain><MessageOutlined /> Сообщения</Divider>
-        </PageHeader>
+        </PageHeader >
 
-      </div>
+      </div >
 
       <div className="task_detail_message_block">
         <div className="messages_block" ref={chatBlock}>
@@ -242,7 +240,7 @@ const TaskDetail = () => {
                 <div key={data.createdAt + data.id}>
                   < Comment
                     author={data.user.name}
-                    avatar={<Avatar alt={data.user.name} style={{ backgroundColor: color }} >{data.user.name}</Avatar>}
+                    avatar={<Avatar alt={data.user.name} style={{ backgroundColor: color }} >{data.user.name.slice(0, 1)}</Avatar>}
                     className="message_block_single"
                     content={
                       <p>
