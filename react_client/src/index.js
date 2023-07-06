@@ -16,15 +16,18 @@ const store = setupStore();
 // Settings theme
 const defaultData = {
     colorPrimary: '#1677ff',
-    colorLink: '#8596a6',
-    borderRadius: 4
+    colorPrimary: '#0ea5e9',
+    colorLink: '#0369a1',
+    borderRadius: 8,
+    fontSize: 15,
+    colorBgLayout: '#e8ebef',
 };
 // Global config notification
 notification.config({
     placement: 'bottomRight',
     bottom: 50,
-    duration: 8,
-    maxCount: 5,
+    duration: 3,
+    maxCount: 3,
 });
 
 const container = document.getElementById('root');
@@ -37,8 +40,10 @@ root.render(
                 theme={{
                     token: {
                         colorPrimary: defaultData.colorPrimary,
-                        //colorLink: defaultData.colorLink,
+                        colorLink: defaultData.colorLink,
                         borderRadius: defaultData.borderRadius,
+                        fontSize: defaultData.fontSize,
+                        colorBgLayout: defaultData.colorBgLayout,
                     },
                     components: {
 
