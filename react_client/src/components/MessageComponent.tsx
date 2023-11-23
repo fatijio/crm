@@ -1,5 +1,11 @@
 import { message } from 'antd';
-const MessagePopup = ({status, variant}) => {
+
+type tMessage = {
+  status: string;
+  variant: string;
+}
+
+const MessagePopup = ({ status, variant }: tMessage) => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const showMessage = () => {
@@ -7,12 +13,12 @@ const MessagePopup = ({status, variant}) => {
       type: 'loading',
       content: 'Загрузка',
       duration: 0,
-    });    
+    });
   };
 
-  if(status) {
+  if (status) {
     showMessage()
-  }else{
+  } else {
     //setTimeout(messageApi.destroy, 2500);
     messageApi.destroy();
   }

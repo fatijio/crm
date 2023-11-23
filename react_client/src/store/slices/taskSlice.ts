@@ -1,10 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { openMessageBox } from './messageSlice';
 import axios from 'axios';
 
-const initialState = {
+type tTask = {
+    loading: boolean;
+    error: object | null;
+    errorName: string | null;
+    statuses: string[];
+    tasks: object[];
+    notify: string | null,
+}
+
+const initialState: tTask = {
     loading: true,
-    error: '',
+    error: null,
     errorName: null,
     statuses: [],
     tasks: [],
@@ -30,7 +39,7 @@ export const getStatuses = createAsyncThunk(
             });
             //console.log('getStatuses', response);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             return rejectWithValue(error.response.data);
         }
     }
@@ -46,7 +55,7 @@ export const getTasks = createAsyncThunk(
                 throw new Error('Server error !');
             }
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             //console.log(error);
             return rejectWithValue(error.response.data);
         }
@@ -66,10 +75,10 @@ export const addTask = createAsyncThunk(
             //console.log('addTask ok', response.data);
             dispatch(openMessageBox(response.data.notify));
             return response.data;
-        } catch (err) {
+        } catch (error: any) {
             //console.log('addTask error', err.response.data);
-            dispatch(openMessageBox(err.response.data.notify));
-            return rejectWithValue(err.response.data);
+            dispatch(openMessageBox(error.response.data.notify));
+            return rejectWithValue(error.response.data);
         }
     }
 
@@ -80,46 +89,46 @@ export const taskSlice = createSlice({
     initialState: initialState,
     reducers: {
         clearNotify(state) {
-          state.notify = null;
+            state.notify = null;
         }
     },
-    extraReducers: {
-        [getTasks.pending]: (state, action) => {
+    extraReducers: (builder) => {
+        builder.addCase(getTasks.pending, (state, action) => {
             state.loading = true;
-            state.error = '';
-        },
-        [getTasks.fulfilled]: (state, action) => {
+            //state.error = '';
+        })
+        builder.addCase(getTasks.fulfilled, (state, action) => {
             //console.log('getTasks/fulfilled', action.payload);
             state.tasks = action.payload.empty ? [] : action.payload;
             state.loading = false;
-        },
-        [getTasks.rejected]: (state, action) => {
-            state.error = action.payload;
+        })
+        builder.addCase(getTasks.rejected, (state, action) => {
+            //state.error = action.payload;
             state.loading = false;
             //state.tasks = [];
-        },
-        [getStatuses.fulfilled]: (state, action) => {
+        })
+        builder.addCase(getStatuses.fulfilled, (state, action) => {
             state.statuses = action.payload;
-        },
+        })
         // ADD TASK
-        [addTask.pending]: (state, action) => {
+        builder.addCase(addTask.pending, (state, action) => {
             state.loading = true;
             //state.notify = null;
             //state.errorName = "start";
-        },
-        [addTask.fulfilled]: (state, action) => {
+        })
+        builder.addCase(addTask.fulfilled, (state, action) => {
             //console.log('addTask/fulfilled', action.payload.data);
             state.tasks.push(action.payload.data);
             state.loading = false;
             //state.notify = action.payload.notify;
-        },
-        [addTask.rejected]: (state, action) => {
+        })
+        builder.addCase(addTask.rejected, (state, action) => {
             //state.error = true;
             //state.errorName = action.payload;
             state.loading = false;
             //state.notify = action.payload.notify;
             //console.log(action.payload);
-        }
+        })
     }
 });
 

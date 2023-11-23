@@ -1,6 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+type tNotify = {
+    messages: tMessages[];
+    loading: boolean;
+}
+
+type tMessages = {
+    [key: string]: string;
+}
+
+const initialState: tNotify = {
+    messages: [],
+    loading: false,
+}
+
 export const getNotifications = createAsyncThunk(
     'notify/getNotifications',
     async function (_, { rejectWithValue }) {
@@ -8,7 +22,7 @@ export const getNotifications = createAsyncThunk(
             const { data } = await axios.get('/api/notifications', { headers: { Authorization: `Bearer ${localStorage.getItem('u-access')}` } });
             //console.log('notify_slice', data);
             return data;
-        } catch (error) {
+        } catch (error: any) {
             console.log(error.response.data);
         }
     }
@@ -21,16 +35,11 @@ export const deleteNotification = createAsyncThunk(
         try {
             const response = await axios.delete(`/api/notifications/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('u-access')}` } });
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             console.log(error.response.data);
         }
     }
 )
-
-const initialState = {
-    messages: [],
-    loading: false,
-}
 
 const notifySlice = createSlice({
     name: 'notify',
@@ -40,24 +49,24 @@ const notifySlice = createSlice({
             state.messages.push(action.payload);
         }
     },
-    extraReducers: {
-        [getNotifications.pending]: (state, action) => {
+    extraReducers: (builder) => {
+        builder.addCase(getNotifications.pending, (state, action) => {
             state.loading = true;
-        },
-        [getNotifications.fulfilled]: (state, action) => {
+        })
+        builder.addCase(getNotifications.fulfilled, (state, action) => {
             state.messages = action.payload;
             state.loading = false;
-        },
-        [getNotifications.rejected]: (state, action) => {
+        })
+        builder.addCase(getNotifications.rejected, (state, action) => {
             state.loading = false;
-        },
-        [deleteNotification.fulfilled]: (state, action) => {
-            console.log('action_id', action.payload);
+        })
+        builder.addCase(deleteNotification.fulfilled, (state, action) => {
+            //console.log('action_id', action.payload);
             state.messages = state.messages.filter(notice => {
                 //console.log('filter', notice)
                 return notice.id !== action.payload;
             });
-        }
+        })
 
     }
 })

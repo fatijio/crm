@@ -6,16 +6,13 @@ import App from './App';
 import 'antd/dist/reset.css';
 import './index.css';
 import { Provider } from 'react-redux';
-import { setupStore } from './store';
+import { store } from './store';
 import { ConfigProvider } from 'antd';
 import ru from 'antd/es/locale/ru_RU';
 import { notification } from 'antd';
 
-const store = setupStore();
-
 // Settings theme
 const defaultData = {
-    colorPrimary: '#1677ff',
     colorPrimary: '#0ea5e9',
     colorLink: '#0369a1',
     borderRadius: 8,
@@ -30,7 +27,7 @@ notification.config({
     maxCount: 3,
 });
 
-const container = document.getElementById('root');
+const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 root.render(
     <Provider store={store}>
@@ -51,7 +48,7 @@ root.render(
                 }}
 
             >
-                <App tab="home" />
+                <App />
             </ConfigProvider>
         </BrowserRouter >
     </Provider >

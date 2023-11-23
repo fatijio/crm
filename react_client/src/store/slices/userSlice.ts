@@ -2,7 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { openMessageBox } from './messageSlice';
 import axios from 'axios';
 
-const initialState = {
+type tUser = {
+    loading: boolean;
+    notify: object | null;
+    users: object[];
+}
+
+const initialState: tUser = {
     loading: false,
     notify: null,
     users: []
@@ -18,7 +24,7 @@ export const getUsers = createAsyncThunk(
                 throw new Error('Server error !');
             }
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             //console.log(error);
             return rejectWithValue(error.response.data);
         }
@@ -27,7 +33,7 @@ export const getUsers = createAsyncThunk(
 
 export const queryUpdateUser = createAsyncThunk(
     'task/queryUpdateUser',
-    async function ({id, newFormData}, { rejectWithValue, dispatch }) {
+    async function ({ id, newFormData }: { id: number, newFormData: object | null }, { rejectWithValue, dispatch }) {
         try {
             const response = await axios.put(`/api/users/${id}`, newFormData, {
                 headers: {
@@ -38,10 +44,10 @@ export const queryUpdateUser = createAsyncThunk(
             //console.log(response.data);
             dispatch(openMessageBox(response.data.notify));
             return response.data;
-        } catch (err) {
+        } catch (error: any) {
             //console.log(err.response.data)
-            dispatch(openMessageBox(err.response.data.notify));
-            return rejectWithValue(err.response.data);
+            dispatch(openMessageBox(error.response.data.notify));
+            return rejectWithValue(error.response.data);
         }
     }
 
@@ -55,37 +61,37 @@ export const userSlice = createSlice({
 
         }
     },
-    extraReducers: {
+    extraReducers: (builder) => {
         // getUsers
-        [getUsers.pending]: (state, action) => {
+        builder.addCase(getUsers.pending, (state, action) => {
             state.loading = true;
             //state.error = '';
-        },
-        [getUsers.fulfilled]: (state, action) => {
+        })
+        builder.addCase(getUsers.fulfilled, (state, action) => {
             //console.log('getTasks/fulfilled', action.payload);
             state.users = action.payload.empty ? [] : action.payload;
             state.loading = false;
-        },
-        [getUsers.rejected]: (state, action) => {
-            state.error = action.payload;
+        })
+        builder.addCase(getUsers.rejected, (state, action) => {
+            //state.error = action.payload;
             state.loading = false;
             //state.tasks = [];
-        },
+        })
         // queryUpdateUser
-        [queryUpdateUser.pending]: (state, action) => {
+        builder.addCase(queryUpdateUser.pending, (state, action) => {
             state.loading = true;
-        },
-        [queryUpdateUser.fulfilled]: (state, action) => {
+        })
+        builder.addCase(queryUpdateUser.fulfilled, (state, action) => {
             //state.notify = action.payload.notify;
             state.loading = false;
-        },
-        [queryUpdateUser.rejected]: (state, action) => {
+        })
+        builder.addCase(queryUpdateUser.rejected, (state, action) => {
             //state.notify = action.payload.notify;
             state.loading = false;
-        },
+        })
     }
 });
 
-export const { clearUsers } = userSlice.actions;
+//export const { clearUsers } = userSlice.actions;
 
 export default userSlice.reducer

@@ -1,6 +1,5 @@
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Badge } from 'antd';
-import React from 'react';
 
 const TopNav = () => {
   return (

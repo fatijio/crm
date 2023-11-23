@@ -6,7 +6,7 @@ import TaskList from './pages/TasksPage';
 import AuthPage from './pages/auth/AuthPage';
 import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from './hooks/hooks';
 import { fetchAuth } from './store/slices/authSlice';
 import { Layout } from 'antd';
 import HeaderTemplate from './pages/template/HeaderTemplate';
@@ -20,20 +20,19 @@ import { openMessageBox } from './store/slices/messageSlice';
 
 const { Content } = Layout;
 
-const App = () => {
+const App: React.FC = () => {
 
-  const dispatch = useDispatch();
-  const { isAuth, group } = useSelector(state => state.auth);
-  const { message } = useSelector(state => state.message);
+  const dispatch = useAppDispatch();
+  const { isAuth, group } = useAppSelector(state => state.auth);
+  const { message } = useAppSelector(state => state.message);
   //console.log('console', isAuth, group);
 
   useEffect(() => {
     //checkAuth && redirect('/');
     const access_token = localStorage.getItem('u-access');
     if (access_token) {
-      console.log('if');
       //dispatch(actionCheckAuth(access_token));
-      dispatch(fetchAuth(access_token));
+      dispatch(fetchAuth());
       if (group && group === 1) {
         dispatch(getStatuses());
       }

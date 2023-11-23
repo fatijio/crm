@@ -5,14 +5,35 @@ import axios from 'axios';
 const ACCESS_KEY = 'u-access';
 //const USERNAME_KEY = 'u-username';
 
+// Типы для Auth стора
+type tAuth = {
+    userId: number | null,
+    login: string,
+    userData: object | null,
+    access: string,
+    isAuth: boolean,
+    group: number,
+    error: object | null
+}
+
+const initialState: tAuth = {
+    userId: null,
+    login: '',
+    userData: null,
+    access: localStorage.getItem(ACCESS_KEY) ?? '',
+    isAuth: false,
+    group: 2,
+    error: null
+}
+
 export const fetchLogin = createAsyncThunk(
     'auth/fetchLogin',
-    async function ([emailData, passwordData], { rejectWithValue }) {
+    async function ([emailData, passwordData]: string[], { rejectWithValue }) {
         try {
             const loginData = await axios.post('/api/auth/login', { email: emailData, password: passwordData });
             //console.log('loginData', loginData);
             return loginData.data;
-        } catch (error) {
+        } catch (error: any) {
             return rejectWithValue(error.response.data);
         }
     }
@@ -20,8 +41,9 @@ export const fetchLogin = createAsyncThunk(
 
 export const fetchAuth = createAsyncThunk(
     'auth/fetchAuth',
-    async function (token, { rejectWithValue }) {
+    async function (_, { rejectWithValue }) {
         try {
+            const token = localStorage.getItem('u-access');
             const checkAccess = await axios.get('/api/auth/access', { params: { token: token } });
             //console.log('checkAccess', checkAccess);
             if (checkAccess.data.type === 'error') {
@@ -35,7 +57,7 @@ export const fetchAuth = createAsyncThunk(
             }
             //console.log(checkAccess.data);
             return checkAccess.data;
-        } catch (error) {
+        } catch (error: any) {
             //console.log('error.response.data', error.response.data);
             return rejectWithValue(error.response.data);
         }
@@ -50,22 +72,12 @@ export const fetchLogout = createAsyncThunk(
             const logout = await axios.post('/api/auth/logout', { withCredentials: true });
             localStorage.removeItem('u-access');
             return logout.data;
-        } catch (error) {
+        } catch (error: any) {
             localStorage.removeItem('u-access');
             return rejectWithValue(error.response.data);
         }
     }
 )
-
-const initialState = {
-    userId: null,
-    login: '',
-    userData: null,
-    access: localStorage.getItem(ACCESS_KEY) ?? '',
-    isAuth: false,
-    group: 2,
-    error: null
-}
 
 const authSlice = createSlice({
     name: 'auth',
@@ -78,45 +90,45 @@ const authSlice = createSlice({
             localStorage.setItem(ACCESS_KEY, action.payload.access_token);
         }
     },
-    extraReducers: {
-        [fetchLogin.fulfilled]: (state, action) => {
-            let user = jwt_decode(action.payload.access_token);
+    extraReducers: (builder) => {
+        builder.addCase(fetchLogin.fulfilled, (state, action) => {
+            let user: any = jwt_decode(action.payload.access_token);
             state.userId = user.id;
             state.login = action.payload.user.login;
             state.userData = action.payload.user;
             state.access = action.payload.access_token;
             state.group = user.group;
             //console.log('action.payload', jwt_decode(action.payload.access_token));
-            console.log('action.payload', action.payload);
+            //console.log('action.payload', action.payload);
             state.isAuth = true;
             localStorage.setItem(ACCESS_KEY, action.payload.access_token);
-        },
-        [fetchLogin.rejected]: (state, action) => {
-            state.error = action.payload;
+        })
+        builder.addCase(fetchLogin.rejected, (state, action) => {
+            //state.error = action.payload;
             state.isAuth = false;
             //console.log(action.payload);
-        },
-        [fetchAuth.pending]: (state) => {
+        })
+        builder.addCase(fetchAuth.pending, (state) => {
             state.error = null;
-        },
-        [fetchAuth.fulfilled]: (state, action) => {
+        })
+        builder.addCase(fetchAuth.fulfilled, (state, action) => {
             state.isAuth = action.payload.isAuth;
             state.login = action.payload.user.name;
             state.group = action.payload.user.group_id;
             state.userData = action.payload.user;
             //state.login = action.payload.email;
             //console.log(action.payload)
-        },
-        [fetchAuth.rejected]: (state, action) => {
+        })
+        builder.addCase(fetchAuth.rejected, (state) => {
             state.isAuth = false;
-        },
-        [fetchLogout.fulfilled]: (state) => {
+        })
+        builder.addCase(fetchLogout.fulfilled, (state) => {
             state.access = '';
             state.isAuth = false;
-        },
-        [fetchLogout.rejected]: (state) => {
+        })
+        builder.addCase(fetchLogout.rejected, (state) => {
             state.isAuth = false;
-        }
+        })
     }
 })
 
